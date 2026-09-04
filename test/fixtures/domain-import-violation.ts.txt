@@ -1,0 +1,11 @@
+// Negative control for lib/domain/architecture.test.ts.
+//
+// Deliberately violates the import-direction rule. Stored outside lib/domain/
+// and with a .txt extension so it is neither scanned by the architecture test
+// nor compiled by tsc; the test reads it as text and asserts the detector
+// reports every violation. Without this fixture, an always-passing detector
+// would be indistinguishable from a working one.
+import { useState } from "react";
+import { neon } from "@neondatabase/serverless";
+import { db } from "@/lib/db/client";
+export { transactions } from "@/lib/db/schema";

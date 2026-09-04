@@ -1,0 +1,59 @@
+schema: spec-driven
+
+context: |
+  Tech stack: Next.js (App Router) + React + TypeScript, pnpm.
+  Database: Neon Postgres (Vercel Marketplace free tier).
+  Auth: single shared password checked in middleware; schema carries
+  a user_id column defaulted to a constant for future multi-account support.
+  Deploy: Vercel free tier, mobile-first (430px shell).
+  UI language: Spanish (product copy). Code/identifiers/comments/SDD
+  artifacts: English.
+  Source design: docs/design/transaction-manager.dc.html (x-dc template
+  compiled by docs/design/dc-runtime-support.js). Reference only, not shipped.
+
+strict_tdd: false
+
+testing:
+  status: not_yet_installed
+  proposed_runner: vitest
+  proposed_test_command: "pnpm test"
+  proposed_unit_layer: "vitest + @testing-library/react"
+  proposed_e2e_layer: "playwright (optional, defer until core flows exist)"
+  notes: |
+    No test runner exists yet (greenfield repo, no package.json).
+    This records INTENT only — nothing has been installed. sdd-apply
+    or an explicit setup task must add the dependency and scripts
+    before strict_tdd can be enabled.
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes (schema migrations, auth changes)
+    - Call out any deviation from the design-analysis domain rules explicitly
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+    - Preserve domain rules from sdd/transaction-manager/design-analysis
+      (cashback net/gross math, per-month budgets, drag-to-reorder, theming, filters)
+  design:
+    - Document Neon Postgres schema decisions with rationale, including the
+      constant-default user_id column
+    - Document the single-shared-password middleware auth flow explicitly
+    - Prefer Server Components / Route Handlers idiomatic to Next.js App Router
+  tasks:
+    - Group by phase, use hierarchical numbering
+    - Keep tasks completable in one session
+    - Never include a pnpm install/build step as implicit — call it out explicitly
+  apply:
+    guidelines:
+      - Follow Next.js App Router conventions
+      - Use pnpm exclusively; never emit npm commands
+      - Keep all UI copy in Spanish; keep code/comments in English
+      - Bundle lucide-react instead of the design's per-icon unpkg fetch
+    tdd: false
+    test_command: "pnpm test"
+  verify:
+    test_command: "pnpm test"
+    build_command: "pnpm build"
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas (schema drops, auth model changes)

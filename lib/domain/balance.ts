@@ -1,0 +1,39 @@
+import type { DomainTransaction } from "@/lib/domain/types";
+
+/**
+ * Nets income against expense across EVERY transaction supplied.
+ *
+ * The caller passes the full history, never a month slice: the home screen's
+ * balance spans all time and is deliberately not month-scoped (obs #59).
+ * Both sides consume the NET `amount`, already cashback-adjusted exactly once
+ * by `computeNetAmount` on the write path.
+ */
+export function totalBalance(transactions: readonly DomainTransaction[]): number {
+  let balance = 0;
+  for (const transaction of transactions) {
+    balance += transaction.type === "income" ? transaction.amount : -transaction.amount;
+  }
+  return balance;
+}
+
+/**
+ * Sums NET expense amounts for one category.
+ *
+ * Contract: `transactions` is ALREADY month-scoped by the caller. The domain
+ * never filters by month string — that is the repository's half-open range
+ * query (`date >= start AND date < endExclusive`). Keeping the scoping out of
+ * here is what structurally removes the prototype's `date.startsWith(monthKey)`
+ * prefix match rather than relocating it.
+ */
+export function spentForCategory(
+  transactions: readonly DomainTransaction[],
+  categoryId: number,
+): number {
+  let spent = 0;
+  for (const transaction of transactions) {
+    if (transaction.type === "expense" && transaction.categoryId === categoryId) {
+      spent += transaction.amount;
+    }
+  }
+  return spent;
+}

@@ -1,0 +1,11 @@
+minimumReleaseAge: 1440
+strictDepBuilds: true
+onlyBuiltDependencies:
+  # esbuild: transitive dep of drizzle-kit. Its postinstall script only selects/links
+  # the correct prebuilt platform binary (no arbitrary compilation); required for
+  # `pnpm db:generate` (drizzle-kit generate) to run at all.
+  - esbuild
+allowBuilds:
+  esbuild: true
+  sharp: false
+  unrs-resolver: false

@@ -1,0 +1,40 @@
+{
+  "name": "transaction-manager",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "TZ=UTC next dev",
+    "build": "TZ=UTC next build",
+    "start": "TZ=UTC next start",
+    "lint": "eslint",
+    "test": "TZ=UTC vitest run",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx lib/db/migrate.ts",
+    "db:seed": "tsx lib/db/seed/default.seed.ts",
+    "db:seed:dev": "tsx lib/db/seed/dev.seed.ts"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
+    "drizzle-orm": "^0.45.2",
+    "lucide-react": "^1.39.0",
+    "next": "16.3.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "server-only": "^0.0.1"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.10",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.4",
+    "jsdom": "^30.0.1",
+    "tsx": "^4.23.13",
+    "typescript": "^5",
+    "vitest": "^4.1.11"
+  },
+  "packageManager": "pnpm@11.25.0"
+}

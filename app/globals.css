@@ -1,0 +1,305 @@
+/*
+ * Every colour in the app is a CSS custom property declared twice: once under
+ * [data-theme='light'] and once under [data-theme='dark']. Nothing in React
+ * reads the effective theme during render, so there is no value the server can
+ * get wrong for 'system' and no hydration mismatch (design §7).
+ *
+ * --accent-0 .. --accent-5 are the two accent cycles from the source design
+ * (obs #59). `categoryColor(colorIndex)` in lib/domain/categories.ts returns
+ * `var(--accent-N)`; ACCENT_CYCLE_LENGTH = 6 is the single numeric coupling
+ * between that module and this file, and a unit test asserts the modulo wrap.
+ */
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #f2f5fa;
+  --surface-card: #ffffff;
+  --text-primary: #0f1b2e;
+  --text-secondary: #5a6e8c;
+  --border: #e4eaf2;
+  --nav-bg: #ffffff;
+  --nav-active: #1a3f75;
+  --nav-inactive: #a5b4cc;
+  --income: #2e9e6e;
+  --expense: #d14a41;
+  --chip-bg: #eef2f8;
+
+  --accent-0: #1a3f75;
+  --accent-1: #4e6a9c;
+  --accent-2: #4ea4cc;
+  --accent-3: #3e8f7a;
+  --accent-4: #d9862e;
+  --accent-5: #d4a93b;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #0a1020;
+  --surface-card: #121b30;
+  --text-primary: #f2f6fc;
+  --text-secondary: #8fa3c4;
+  --border: rgb(255 255 255 / 8%);
+  --nav-bg: #0f1728;
+  --nav-active: #4ea4cc;
+  --nav-inactive: #5e7196;
+  --income: #3fbf88;
+  --expense: #e2685e;
+  --chip-bg: rgb(255 255 255 / 6%);
+
+  /* The separate, brighter dark-mode cycle. Same six slots, so the same
+     `var(--accent-N)` string resolves correctly under either theme. */
+  --accent-0: #7ba0d8;
+  --accent-1: #9fb4d4;
+  --accent-2: #6fc3e8;
+  --accent-3: #57bfa1;
+  --accent-4: #e8a455;
+  --accent-5: #e0c25c;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  height: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--text-primary);
+  background: var(--bg);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ---------- shell ---------- */
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 430px;
+  min-height: 100dvh;
+  background: var(--bg);
+}
+
+.shell__content {
+  flex: 1;
+  padding: 20px 16px calc(88px + env(safe-area-inset-bottom));
+}
+
+.screen__title {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* ---------- bottom nav ---------- */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: center;
+  width: 100%;
+  max-width: 430px;
+  padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+  background: var(--nav-bg);
+  border-top: 1px solid var(--border);
+}
+
+.bottom-nav__tab {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+  color: var(--nav-inactive);
+  font-size: 11px;
+}
+
+.bottom-nav__tab--active {
+  color: var(--nav-active);
+  font-weight: 600;
+}
+
+.bottom-nav__fab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: center;
+  width: 52px;
+  height: 52px;
+  color: var(--nav-bg);
+  background: var(--nav-active);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* ---------- atoms ---------- */
+
+.btn {
+  padding: 12px 18px;
+  font: inherit;
+  font-weight: 600;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.btn--primary {
+  color: var(--nav-bg);
+  background: var(--nav-active);
+}
+
+.btn--secondary {
+  color: var(--text-primary);
+  background: var(--chip-bg);
+  border-color: var(--border);
+}
+
+.btn--ghost {
+  color: var(--text-secondary);
+  background: transparent;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  color: var(--text-primary);
+  font: inherit;
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  font-size: 13px;
+  background: var(--chip-bg);
+  border-radius: 999px;
+}
+
+.chip--active {
+  color: var(--nav-bg);
+  background: var(--nav-active);
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  color: var(--nav-bg);
+  font-size: 14px;
+  font-weight: 700;
+  background: var(--accent-0);
+  border-radius: 50%;
+}
+
+.progress {
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  background: var(--chip-bg);
+  border-radius: 999px;
+}
+
+.progress__fill {
+  height: 100%;
+  border-radius: 999px;
+}
+
+.progress--under .progress__fill {
+  background: var(--income);
+}
+
+.progress--over .progress__fill {
+  background: var(--expense);
+}
+
+.progress--neutral .progress__fill {
+  background: var(--nav-inactive);
+}
+
+/* ---------- login ---------- */
+
+.login {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+  width: 100%;
+  max-width: 430px;
+  min-height: 100dvh;
+  padding: 24px;
+}
+
+.login__title {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.login__subtitle {
+  margin-bottom: 20px;
+  color: var(--text-secondary);
+}
+
+.login__form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.login__label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.login__error {
+  color: var(--expense);
+  font-size: 13px;
+}
+
+.login__submit {
+  margin-top: 8px;
+  padding: 13px 18px;
+  color: var(--nav-bg);
+  font: inherit;
+  font-weight: 600;
+  background: var(--nav-active);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.login__submit:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}

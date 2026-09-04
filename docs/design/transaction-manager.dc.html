@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #0A1020; }
+    * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+    input, select { font-family: inherit; }
+    ::-webkit-scrollbar { display: none; }
+    a { color: {{ colors.navActive }}; }
+  </style>
+</helmet>
+
+<div style="max-width:430px;margin:0 auto;height:100vh;display:flex;flex-direction:column;background:{{ colors.bg }};color:{{ colors.textPrimary }};position:relative;overflow:hidden;">
+
+  <div style="flex:1;overflow-y:auto;padding:20px 20px 100px;">
+
+    <!-- HOME -->
+    <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:44px;height:44px;border-radius:50%;background:{{ colors.navActive }};display:flex;align-items:center;justify-content:center;font-weight:700;color:{{ colors.bg }};font-size:16px;">{{ profileInitial }}</div>
+            <div>
+              <div style="font-size:13px;color:{{ colors.textSecondary }};">{{ greeting }}</div>
+              <div style="font-size:18px;font-weight:700;">{{ state.profileUser }}</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <sc-for list="{{ users }}" as="u" hint-placeholder-count="2">
+              <button onClick="{{ u.onSelect }}" style="border:1px solid {{ colors.border }};background:{{ u.selected }};color:{{ colors.textPrimary }};border-radius:20px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">{{ u.name }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="background:linear-gradient(135deg,#1A3F75 0%,#00002A 100%);border-radius:24px;padding:22px;color:#fff;position:relative;overflow:hidden;margin-bottom:14px;">
+          <div style="position:absolute;top:-30px;right:-20px;width:110px;height:110px;border-radius:50%;background:#4EA4CC;opacity:0.35;"></div>
+          <div style="position:absolute;bottom:-40px;left:-30px;width:100px;height:100px;border-radius:50%;background:#D4A93B;opacity:0.25;"></div>
+          <div style="position:relative;z-index:1;">
+            <div style="font-size:13px;opacity:0.75;margin-bottom:6px;">Total disponible</div>
+            <div style="font-size:32px;font-weight:800;">{{ totalBalanceStr }}</div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;margin-top:22px;">
+          <div style="font-size:17px;font-weight:700;">Categorías</div>
+          <div style="font-size:12px;font-weight:700;color:{{ colors.navActive }};background:{{ colors.chipBg }};padding:5px 12px;border-radius:14px;">{{ monthLabel }}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;touch-action:{{ gridTouchAction }};">
+          <sc-for list="{{ homeBudgetRows }}" as="row" hint-placeholder-count="4">
+            <div data-cat="{{ row.category }}" onPointerDown="{{ row.onPointerDown }}" style="background:{{ colors.surfaceCard }};border:1px solid {{ row.dragBorder }};border-radius:18px;padding:14px;user-select:none;cursor:grab;transform:{{ row.dragTransform }};box-shadow:{{ row.dragShadow }};opacity:{{ row.dragOpacity }};transition:transform 0.12s ease,box-shadow 0.12s ease;">
+              <div style="display:flex;align-items:center;justify-content:space-between;color:{{ colors.textSecondary }};font-size:13px;margin-bottom:4px;">
+                <span>{{ row.category }}</span>
+              </div>
+              <div style="font-size:17px;font-weight:800;margin-bottom:8px;">{{ row.leftBigStr }}</div>
+              <div style="height:6px;border-radius:4px;background:{{ colors.chipBg }};overflow:hidden;margin-bottom:6px;">
+                <div style="height:100%;border-radius:4px;background:{{ row.barColor }};width:{{ row.pctStr }};"></div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:{{ colors.textSecondary }};">
+                <span>{{ row.pctSpentStr }}</span>
+                <span>{{ row.spentSmallStr }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="font-size:17px;font-weight:700;margin-bottom:12px;">Últimos movimientos</div>
+        <div style="display:flex;flex-direction:column;gap:2px;">
+          <sc-for list="{{ recentRows }}" as="tx" hint-placeholder-count="5">
+            <div onClick="{{ tx.onEdit }}" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid {{ colors.border }};cursor:pointer;">
+              <div style="width:38px;height:38px;flex-shrink:0;display:flex;align-items:center;justify-content:center;"><div style="width:22px;height:22px;background:{{ tx.color }};-webkit-mask:url({{ tx.icon }}) center/contain no-repeat;mask:url({{ tx.icon }}) center/contain no-repeat;"></div></div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:14px;font-weight:600;">{{ tx.category }}</div>
+                <div style="font-size:12px;color:{{ colors.textSecondary }};">{{ tx.user }} · {{ tx.dateStr }}{{ tx.cashbackTag }}</div>
+              </div>
+              <div style="font-size:15px;font-weight:700;color:{{ tx.amountColor }};white-space:nowrap;">{{ tx.amountStr }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- BUDGET -->
+    <sc-if value="{{ isBudget }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="font-size:22px;font-weight:800;margin-bottom:16px;">Presupuesto</div>
+
+        <div style="position:relative;margin-bottom:16px;">
+          <button onClick="{{ toggleMonthPicker }}" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:{{ colors.surfaceCard }};border:1px solid {{ colors.border }};border-radius:16px;padding:14px 16px;color:{{ colors.textPrimary }};font-size:15px;font-weight:700;cursor:pointer;">
+            <span>{{ monthLabel }}</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <sc-if value="{{ state.monthPickerOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;top:56px;left:0;right:0;background:{{ colors.surfaceCard }};border:1px solid {{ colors.border }};border-radius:16px;max-height:260px;overflow-y:auto;z-index:20;box-shadow:0 12px 30px rgba(0,0,0,0.35);">
+              <sc-for list="{{ monthOptions }}" as="m" hint-placeholder-count="6">
+                <div onClick="{{ m.onSelect }}" style="padding:12px 16px;font-size:14px;font-weight:600;cursor:pointer;background:{{ m.bg }};">{{ m.label }}</div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-bottom:18px;">
+          <div style="flex:1;background:{{ colors.surfaceCard }};border:1px solid {{ colors.border }};border-radius:16px;padding:14px;">
+            <div style="font-size:12px;color:{{ colors.textSecondary }};">Presupuestado</div>
+            <div style="font-size:18px;font-weight:800;">{{ budgetTotalStr }}</div>
+            <div style="font-size:11px;color:{{ colors.textSecondary }};margin-top:2px;">{{ budgetDeltaStr }}</div>
+          </div>
+          <div style="flex:1;background:{{ colors.surfaceCard }};border:1px solid {{ colors.border }};border-radius:16px;padding:14px;">
+            <div style="font-size:12px;color:{{ colors.textSecondary }};">Gastado</div>
+            <div style="font-size:18px;font-weight:800;">{{ budgetSpentStr }}</div>
+            <div style="font-size:11px;color:{{ colors.textSecondary }};margin-top:2px;">{{ budgetLeftStr }}</div>
+          </div>
+        </div>
+
+        <sc-if value="{{ hasPrevBudget }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ copyFromPreviousMonth }}" style="width:100%;background:{{ colors.chipBg }};border:1px dashed {{ colors.navActive }};color:{{ colors.navActive }};border-radius:14px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:18px;">Copiar presupuesto de {{ prevMonthLabel }}</button>
+        </sc-if>
+
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+          <sc-for list="{{ budgetRows }}" as="row" hint-placeholder-count="6">
+            <div style="background:{{ colors.surfaceCard }};border:1px solid {{ colors.border }};border-radius:16px;padding:14px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div style="width:26px;height:26px;display:flex;align-items:center;justify-content:center;"><div style="width:18px;height:18px;background:{{ row.color }};-webkit-mask:url({{ row.icon }}) center/contain no-repeat;mask:url({{ row.icon }}) center/contain no-repeat;"></div></div>
+                  <div style="font-size:14px;font-weight:700;">{{ row.category }}</div>
+                </div>
+                <button onClick="{{ row.onRemove }}" style="border:none;background:none;color:{{ colors.textSecondary }};cursor:pointer;font-size:16px;line-height:1;">×</button>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span style="font-size:13px;color:{{ colors.textSecondary }};">$</span>
+                  <input type="number" value="{{ row.amount }}" onChange="{{ row.onChange }}" style="width:100px;background:{{ colors.chipBg }};border:1px solid {{ colors.border }};border-radius:10px;padding:6px 8px;font-size:14px;font-weight:700;color:{{ colors.textPrimary }};">
+                </div>
+                <div style="font-size:12px;color:{{ colors.textSecondary }};">{{ row.spentStr }}</div>
+              </div>
+              <div style="height:5px;border-radius:3px;background:{{ colors.chipBg }};overflow:hidden;margin-top:8px;">
+                <div style="height:100%;border-radius:3px;background:{{ row.barColor }};width:{{ row.pctStr }};"></div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ state.categoryPickerOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="background:{{ colors.surfaceCard }};border:1px solid {{ colors.border }};border-radius:16px;padding:14px;margin-bottom:16px;">
+            <select value="{{ state.newBudgetCategory }}" onChange="{{ onNewBudgetCategoryChange }}" style="width:100%;padding:10px;border-radius:10px;border:1px solid {{ colors.border }};background:{{ colors.chipBg }};color:{{ colors.textPrimary }};font-size:14px;margin-bottom:10px;">
+              <option value="">Elegir categoría…</option>
+              <sc-for list="{{ availableCategories }}" as="c" hint-placeholder-count="4">
+                <option value="{{ c }}">{{ c }}</option>
+              </sc-for>
+            </select>
+            <input type="number" placeholder="Monto" value="{{ state.newBudgetAmount }}" onChange="{{ onNewBudgetAmountChange }}" style="width:100%;padding:10px;border-radius:10px;border:1px solid {{ colors.border }};background:{{ colors.chipBg }};color:{{ colors.textPrimary }};font-size:14px;margin-bottom:10px;">
+            <div style="display:flex;gap:8px;">
+              <button onClick="{{ addBudgetCategory }}" style="flex:1;background:{{ colors.navActive }};border:none;color:#00131f;font-weight:700;padding:10px;border-radius:10px;cursor:pointer;">Agregar</button>
+              <button onClick="{{ closeCategoryPicker }}" style="flex:1;background:none;border:1px solid {{ colors.border }};color:{{ colors.textPrimary }};font-weight:700;padding:10px;border-radius:10px;cursor:pointer;">Cancelar</button>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ showAddCategoryButton }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ openCategoryPicker }}" style="width:100%;border:1px solid {{ colors.border }};background:none;color:{{ colors.textPrimary }};border-radius:14px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;">+ Agregar categoría</button>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <!-- TRANSACTIONS -->
+    <sc-if value="{{ isTransactions }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="font-size:22px;font-weight:800;margin-bottom:16px;">Movimientos</div>
+
+        <div style="display:flex;gap:8px;overflow-x:auto;margin-bottom:10px;padding-bottom:4px;">
+          <sc-for list="{{ typeFilters }}" as="tf" hint-placeholder-count="3">
+            <button onClick="{{ tf.onSelect }}" style="flex-shrink:0;border:1px solid {{ colors.border }};background:{{ tf.bg }};color:{{ tf.fg }};border-radius:16px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;">{{ tf.label }}</button>
+          </sc-for>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+          <select value="{{ state.filterCategory }}" onChange="{{ onFilterCategoryChange }}" style="padding:9px;border-radius:10px;border:1px solid {{ colors.border }};background:{{ colors.surfaceCard }};color:{{ colors.textPrimary }};font-size:12px;">
+            <option value="all">Toda categoría</option>
+            <sc-for list="{{ categoriesList }}" as="c" hint-placeholder-count="4">
+              <option value="{{ c }}">{{ c }}</option>
+            </sc-for>
+          </select>
+          <select value="{{ state.filterUser }}" onChange="{{ onFilterUserChange }}" style="padding:9px;border-radius:10px;border:1px solid {{ colors.border }};background:{{ colors.surfaceCard }};color:{{ colors.textPrimary }};font-size:12px;">
+            <option value="all">Toda persona</option>
+            <sc-for list="{{ usersList }}" as="u" hint-placeholder-count="2">
+              <option value="{{ u }}">{{ u }}</option>
+            </sc-for>
+          </select>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:16px;">
+          <input type="date" value="{{ state.filterFrom }}" onChange="{{ onFilterFromChange }}" style="padding:8px;border-radius:10px;border:1px solid {{ colors.border }};background:{{ colors.surfaceCard }};color:{{ colors.textPrimary }};font-size:12px;">
+          <input type="date" value="{{ state.filterTo }}" onChange="{{ onFilterToChange }}" style="padding:8px;border-radius:10px;border:1px solid {{ colors.border }};background:{{ colors.surfaceCard }};color:{{ colors.textPrimary }};font-size:12px;">
+          <button onClick="{{ toggleSortDir }}" style="border:1px solid {{ colors.border }};background:{{ colors.surfaceCard }};color:{{ colors.textPrimary }};border-radius:10px;padding:0 10px;font-size:12px;font-weight:700;cursor:pointer;">{{ sortLabel }}</button>
+        </div>
+
+        <div style="font-size:12px;color:{{ colors.textSecondary }};margin-bottom:8px;">{{ filterCountLabel }}</div>
+        <div style="display:flex;flex-direction:column;gap:2px;">
+          <sc-for list="{{ filteredRows }}" as="tx" hint-placeholder-count="6">
+            <div onClick="{{ tx.onEdit }}" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid {{ colors.border }};cursor:pointer;">
+              <div style="width:38px;height:38px;flex-shrink:0;display:flex;align-items:center;justify-content:center;"><div style="width:22px;height:22px;background:{{ tx.color }};-webkit-mask:url({{ tx.icon }}) center/contain no-repeat;mask:url({{ tx.icon }}) center/contain no-repeat;"></div></div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:14px;font-weight:600;">{{ tx.category }}</div>
+                <div style="font-size:12px;color:{{ colors.textSecondary }};">{{ tx.user }} · {{ tx.dateStr }}{{ tx.cashbackTag }}</div>
+              </div>
+              <div style="font-size:15px;font-weight:700;color:{{ tx.amountColor }};white-space:nowrap;">{{ tx.amountStr }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- PROFILE -->
+    <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="font-size:22px;font-weight:800;margin-bottom:16px;">Perfil</div>
+
+        <div style="background:{{ colors.surfaceCard }};border:1px solid {{ colors.border }};border-radius:18px;padding:18px;display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+          <div style="width:56px;height:56px;border-radius:50%;background:{{ colors.navActive }};display:flex;align-items:center;justify-content:center;font-weight:700;color:{{ colors.bg }};font-size:20px;">{{ profileInitial }}</div>
+          <div>
+            <div style="font-size:16px;font-weight:700;">{{ state.profileUser }}</div>
+            <div style="font-size:12px;color:{{ colors.textSecondary }};">Cuenta compartida</div>
+          </div>
+        </div>
+
+        <div style="font-size:14px;font-weight:700;color:{{ colors.textSecondary }};margin-bottom:10px;">Tema</div>
+        <div style="display:flex;gap:8px;margin-bottom:24px;">
+          <sc-for list="{{ themeOptions }}" as="t" hint-placeholder-count="3">
+            <button onClick="{{ t.onSelect }}" style="flex:1;border:1px solid {{ t.border }};background:{{ t.bg }};color:{{ t.fg }};border-radius:14px;padding:12px 0;font-size:13px;font-weight:700;cursor:pointer;">{{ t.label }}</button>
+          </sc-for>
+        </div>
+
+        <div style="font-size:14px;font-weight:700;color:{{ colors.textSecondary }};margin-bottom:10px;">Personas</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
+          <sc-for list="{{ userRows }}" as="u" hint-placeholder-count="2">
+            <div style="display:flex;align-items:center;justify-content:between;background:{{ colors.surfaceCard }};border:1px solid {{ colors.border }};border-radius:14px;padding:12px 14px;">
+              <div style="flex:1;font-size:14px;font-weight:600;">{{ u.name }}</div>
+              <button onClick="{{ u.onRemove }}" style="border:none;background:none;color:{{ colors.textSecondary }};cursor:pointer;font-size:16px;">×</button>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:24px;">
+          <input placeholder="Nueva persona" value="{{ state.newUserName }}" onChange="{{ onNewUserNameChange }}" style="flex:1;padding:10px;border-radius:10px;border:1px solid {{ colors.border }};background:{{ colors.surfaceCard }};color:{{ colors.textPrimary }};font-size:13px;">
+          <button onClick="{{ addUser }}" style="border:none;background:{{ colors.navActive }};color:#00131f;font-weight:700;padding:0 16px;border-radius:10px;cursor:pointer;">Agregar</button>
+        </div>
+
+        <div style="font-size:14px;font-weight:700;color:{{ colors.textSecondary }};margin-bottom:10px;">Categorías</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
+          <sc-for list="{{ categoryChips }}" as="c" hint-placeholder-count="6">
+            <div style="display:flex;align-items:center;gap:6px;background:{{ colors.chipBg }};border-radius:14px;padding:7px 8px 7px 12px;font-size:12px;font-weight:600;">
+              <span>{{ c.name }}</span>
+              <button onClick="{{ c.onRemove }}" style="border:none;background:none;color:{{ colors.textSecondary }};cursor:pointer;font-size:14px;line-height:1;">×</button>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:20px;">
+          <input placeholder="Nueva categoría" value="{{ state.newCategoryName }}" onChange="{{ onNewCategoryNameChange }}" style="flex:1;padding:10px;border-radius:10px;border:1px solid {{ colors.border }};background:{{ colors.surfaceCard }};color:{{ colors.textPrimary }};font-size:13px;">
+          <button onClick="{{ addCategory }}" style="border:none;background:{{ colors.navActive }};color:#00131f;font-weight:700;padding:0 16px;border-radius:10px;cursor:pointer;">Agregar</button>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+
+  <div style="position:absolute;bottom:0;left:0;right:0;height:78px;background:{{ colors.navBg }};border-top:1px solid {{ colors.border }};display:flex;align-items:center;justify-content:space-around;padding:0 6px;">
+    <button onClick="{{ goHome }}" style="background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:{{ navHomeColor }};">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+      <span style="font-size:11px;font-weight:700;">Inicio</span>
+    </button>
+    <button onClick="{{ goBudget }}" style="background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:{{ navBudgetColor }};">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 3v9l7 4"></path></svg>
+      <span style="font-size:11px;font-weight:700;">Presupuesto</span>
+    </button>
+
+    <button onClick="{{ openAdd }}" style="background:{{ colors.navActive }};border:4px solid {{ colors.navBg }};width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-top:-30px;box-shadow:0 8px 18px rgba(0,0,0,0.3);flex-shrink:0;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00131f" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    </button>
+
+    <button onClick="{{ goTransactions }}" style="background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:{{ navTransactionsColor }};">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="18" x2="14" y2="18"></line></svg>
+      <span style="font-size:11px;font-weight:700;">Movimientos</span>
+    </button>
+    <button onClick="{{ goProfile }}" style="background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:{{ navProfileColor }};">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+      <span style="font-size:11px;font-weight:700;">Perfil</span>
+    </button>
+  </div>
+
+  <sc-if value="{{ state.addOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:flex-end;z-index:50;">
+      <div style="background:{{ colors.bg }};width:100%;border-radius:24px 24px 0 0;padding:20px;max-height:88%;overflow-y:auto;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+          <div style="font-size:18px;font-weight:800;">{{ sheetTitle }}</div>
+          <button onClick="{{ closeAdd }}" style="border:none;background:none;color:{{ colors.textSecondary }};font-size:22px;cursor:pointer;line-height:1;">×</button>
+        </div>
+
+        <div style="display:flex;background:{{ colors.chipBg }};border-radius:14px;padding:4px;margin-bottom:18px;">
+          <button onClick="{{ setAddExpense }}" style="flex:1;padding:10px 0;border-radius:11px;border:none;font-weight:700;font-size:13px;cursor:pointer;background:{{ addExpenseBg }};color:{{ addExpenseFg }};">Gasto</button>
+          <button onClick="{{ setAddIncome }}" style="flex:1;padding:10px 0;border-radius:11px;border:none;font-weight:700;font-size:13px;cursor:pointer;background:{{ addIncomeBg }};color:{{ addIncomeFg }};">Ingreso</button>
+        </div>
+
+        <div style="text-align:center;margin-bottom:18px;">
+          <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
+            <span style="font-size:28px;font-weight:700;color:{{ colors.textSecondary }};">$</span>
+            <input type="number" inputmode="decimal" placeholder="0" value="{{ state.addAmount }}" onChange="{{ onAddAmountChange }}" style="width:180px;border:none;background:none;font-size:40px;font-weight:800;color:{{ colors.textPrimary }};text-align:center;">
+          </div>
+        </div>
+
+        <sc-if value="{{ isExpenseAdd }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;background:{{ colors.surfaceCard }};border:1px solid {{ colors.border }};border-radius:14px;padding:12px 14px;margin-bottom:20px;">
+            <div>
+              <div style="font-size:13px;font-weight:700;">Cashback</div>
+              <div style="font-size:11px;color:{{ colors.textSecondary }};">{{ cashbackNote }}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;">
+              <input type="number" inputmode="decimal" placeholder="0" value="{{ state.addCashback }}" onChange="{{ onAddCashbackChange }}" style="width:64px;background:{{ colors.chipBg }};border:1px solid {{ colors.border }};border-radius:10px;padding:8px;font-size:15px;font-weight:700;color:{{ colors.textPrimary }};text-align:right;" />
+              <span style="font-size:15px;font-weight:700;color:{{ colors.textSecondary }};">%</span>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="font-size:13px;font-weight:700;color:{{ colors.textSecondary }};margin-bottom:10px;">Categoría</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px;">
+          <sc-for list="{{ addCategoryOptions }}" as="c" hint-placeholder-count="6">
+            <button onClick="{{ c.onSelect }}" style="display:flex;flex-direction:column;align-items:center;gap:6px;border:2px solid {{ c.borderColor }};background:{{ colors.chipBg }};border-radius:14px;padding:10px 4px;cursor:pointer;">
+              <div style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;"><div style="width:20px;height:20px;background:{{ c.color }};-webkit-mask:url({{ c.icon }}) center/contain no-repeat;mask:url({{ c.icon }}) center/contain no-repeat;"></div></div>
+              <span style="font-size:11px;font-weight:600;color:{{ colors.textPrimary }};text-align:center;">{{ c.name }}</span>
+            </button>
+          </sc-for>
+        </div>
+
+        <div style="font-size:13px;font-weight:700;color:{{ colors.textSecondary }};margin-bottom:10px;">Quién</div>
+        <div style="display:flex;gap:8px;margin-bottom:22px;">
+          <sc-for list="{{ addUserOptions }}" as="u" hint-placeholder-count="2">
+            <button onClick="{{ u.onSelect }}" style="flex:1;border:1px solid {{ u.border }};background:{{ u.bg }};color:{{ u.fg }};border-radius:12px;padding:10px 0;font-size:13px;font-weight:700;cursor:pointer;">{{ u.name }}</button>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ isEditing }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:{{ colors.textSecondary }};margin-bottom:10px;">Fecha y hora</div>
+            <input type="datetime-local" value="{{ state.addDate }}" onChange="{{ onAddDateChange }}" style="width:100%;padding:11px;border-radius:12px;border:1px solid {{ colors.border }};background:{{ colors.surfaceCard }};color:{{ colors.textPrimary }};font-size:14px;margin-bottom:22px;" />
+          </div>
+        </sc-if>
+
+        <button onClick="{{ submitAdd }}" disabled="{{ submitDisabled }}" style="width:100%;background:{{ colors.navActive }};opacity:{{ submitOpacity }};border:none;color:#00131f;font-weight:800;padding:15px;border-radius:14px;font-size:15px;cursor:pointer;">{{ submitLabel }}</button>
+        <sc-if value="{{ isEditing }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ deleteTransaction }}" style="width:100%;background:none;border:none;color:{{ colors.expense }};font-weight:700;padding:14px;font-size:14px;cursor:pointer;margin-top:6px;">Eliminar movimiento</button>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const MONTHS_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const MONTHS_ABBR_ES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const ACCENT_CYCLE = ['#1A3F75','#4E6A9C','#4EA4CC','#3E8F7A','#D9862E','#D4A93B'];
+const ACCENT_CYCLE_DARK = ['#7BA0D8','#9FB4D4','#6FC3E8','#57BFA1','#E8A455','#E0C25C'];
+
+class Component extends DCLogic {
+  state = {
+    theme: 'system',
+    systemPrefersDark: true,
+    cardOrder: null,
+    draggingCat: null,
+    activeTab: 'home',
+    profileUser: 'Sofi',
+    addOpen: false,
+    addType: 'expense',
+    addAmount: '',
+    addCategory: '',
+    addUser: 'Sofi',
+    addDate: '',
+    addCashback: '',
+    editingId: null,
+    monthKey: '2026-08',
+    monthPickerOpen: false,
+    categoryPickerOpen: false,
+    newBudgetCategory: '',
+    newBudgetAmount: '',
+    filterType: 'all',
+    filterCategory: 'all',
+    filterUser: 'all',
+    filterFrom: '',
+    filterTo: '',
+    sortMode: 'date',
+    newUserName: '',
+    newCategoryName: '',
+    users: ['Sofi', 'Mati'],
+    categories: ['Super','Alquiler','Luz','Gas','Agua','Expensas','Casa','Salud','Deporte','Chicas','Cumple','Peluquería','Nafta','Date and fun time','Ofrendas','Diezmo','Fondo de emergencia','Ahorro'],
+    incomeCategories: ['Sueldo', 'Regalo', 'Otro'],
+    budgets: {
+      '2026-07': { Super: 140000, Alquiler: 300000, Luz: 35000, Gas: 14000, Agua: 9000, Expensas: 58000, Nafta: 45000, Salud: 25000, Ahorro: 90000 },
+      '2026-08': { Super: 150000, Alquiler: 300000, Luz: 40000, Gas: 15000, Agua: 10000, Expensas: 60000, Nafta: 50000, Salud: 30000, 'Date and fun time': 40000, Ahorro: 100000 }
+    },
+    transactions: [
+      { id: 1, type: 'expense', amount: 45000, category: 'Super', user: 'Sofi', date: '2026-08-29T18:42' },
+      { id: 2, type: 'expense', amount: 12000, category: 'Nafta', user: 'Mati', date: '2026-08-29T09:15' },
+      { id: 3, type: 'expense', amount: 8000, category: 'Peluquería', user: 'Sofi', date: '2026-08-28T16:05' },
+      { id: 4, type: 'income', amount: 500000, category: 'Sueldo', user: 'Mati', date: '2026-08-28T08:00' },
+      { id: 5, type: 'expense', amount: 60000, category: 'Expensas', user: 'Mati', date: '2026-08-27T11:30' },
+      { id: 6, type: 'expense', amount: 15000, category: 'Gas', user: 'Sofi', date: '2026-08-26T20:10' },
+      { id: 7, type: 'expense', amount: 22000, category: 'Date and fun time', user: 'Mati', date: '2026-08-25T21:00' },
+      { id: 8, type: 'expense', amount: 9500, category: 'Agua', user: 'Sofi', date: '2026-08-24T10:20' },
+      { id: 9, type: 'expense', amount: 35000, category: 'Luz', user: 'Mati', date: '2026-08-23T19:45' },
+      { id: 10, type: 'expense', amount: 18000, category: 'Salud', user: 'Sofi', date: '2026-08-22T13:10' },
+      { id: 11, type: 'income', amount: 450000, category: 'Sueldo', user: 'Sofi', date: '2026-08-15T08:00' },
+      { id: 12, type: 'expense', amount: 60000, category: 'Super', user: 'Mati', date: '2026-08-14T17:25' },
+      { id: 13, type: 'expense', amount: 300000, category: 'Alquiler', user: 'Mati', date: '2026-08-05T09:00' },
+      { id: 14, type: 'expense', amount: 20000, category: 'Chicas', user: 'Sofi', date: '2026-08-10T15:40' },
+      { id: 15, type: 'expense', amount: 10000, category: 'Cumple', user: 'Sofi', date: '2026-08-08T12:00' },
+      { id: 16, type: 'expense', amount: 5000, category: 'Diezmo', user: 'Mati', date: '2026-08-03T09:30' },
+      { id: 17, type: 'income', amount: 20000, category: 'Regalo', user: 'Sofi', date: '2026-08-02T14:00' },
+      { id: 18, type: 'expense', amount: 130000, category: 'Super', user: 'Sofi', date: '2026-07-29T18:00' },
+      { id: 19, type: 'expense', amount: 300000, category: 'Alquiler', user: 'Mati', date: '2026-07-05T09:00' },
+      { id: 20, type: 'expense', amount: 45000, category: 'Nafta', user: 'Mati', date: '2026-07-12T10:00' }
+    ]
+  };
+
+  componentDidMount() {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    this.setState({ systemPrefersDark: mq.matches });
+    this._mq = mq;
+    this._mqHandler = (e) => this.setState({ systemPrefersDark: e.matches });
+    mq.addEventListener && mq.addEventListener('change', this._mqHandler);
+  }
+  componentWillUnmount() {
+    if (this._mq && this._mqHandler) this._mq.removeEventListener('change', this._mqHandler);
+  }
+
+  effectiveTheme() {
+    if (this.state.theme === 'system') return this.state.systemPrefersDark ? 'dark' : 'light';
+    return this.state.theme;
+  }
+
+  getColors() {
+    const dark = {
+      bg: '#0A1020', surfaceCard: '#121B30', textPrimary: '#F2F6FC', textSecondary: '#8FA3C4',
+      border: 'rgba(255,255,255,0.08)', navBg: '#0F1728', navActive: '#4EA4CC', navInactive: '#5E7196',
+      income: '#3FBF88', expense: '#E2685E', chipBg: 'rgba(255,255,255,0.06)'
+    };
+    const light = {
+      bg: '#F2F5FA', surfaceCard: '#FFFFFF', textPrimary: '#0F1B2E', textSecondary: '#5A6E8C',
+      border: '#E4EAF2', navBg: '#FFFFFF', navActive: '#1A3F75', navInactive: '#A5B4CC',
+      income: '#2E9E6E', expense: '#D14A41', chipBg: '#EEF2F8'
+    };
+    return this.effectiveTheme() === 'dark' ? dark : light;
+  }
+
+  fmt(n) {
+    const v = Math.round(n || 0);
+    return (v < 0 ? '-$' : '$') + Math.abs(v).toLocaleString('es-AR');
+  }
+
+  fmtDate(iso) {
+    const d = new Date(iso);
+    const day = d.getDate();
+    const mon = MONTHS_ABBR_ES[d.getMonth()];
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
+    return `${day} ${mon} · ${hh}:${mm}`;
+  }
+
+  monthKeyLabel(key) {
+    const [y, m] = key.split('-');
+    return `${MONTHS_ES[parseInt(m, 10) - 1]} ${y}`;
+  }
+
+  prevMonthKey(key) {
+    const [y, m] = key.split('-').map(Number);
+    const d = new Date(y, m - 2, 1);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  }
+
+  iconUrl(category) {
+    const map = {
+      'super': 'shopping-cart', 'alquiler': 'key-round', 'luz': 'lightbulb', 'gas': 'flame',
+      'agua': 'droplet', 'expensas': 'building-2', 'casa': 'house', 'salud': 'heart-pulse',
+      'deporte': 'dumbbell', 'chicas': 'users', 'cumple': 'cake', 'peluquería': 'scissors',
+      'peluqueria': 'scissors', 'nafta': 'fuel', 'date and fun time': 'wine',
+      'ofrendas': 'hand-heart', 'diezmo': 'church', 'fondo de emergencia': 'shield',
+      'ahorro': 'piggy-bank', 'sueldo': 'banknote', 'regalo': 'gift', 'otro': 'circle-ellipsis'
+    };
+    const name = map[String(category).toLowerCase()] || 'tag';
+    return `https://unpkg.com/lucide-static@0.454.0/icons/${name}.svg`;
+  }
+
+  categoryColor(name) {
+    const idx = this.state.categories.indexOf(name);
+    const cycle = this.effectiveTheme() === 'dark' ? ACCENT_CYCLE_DARK : ACCENT_CYCLE;
+    return cycle[(idx < 0 ? 0 : idx) % cycle.length];
+  }
+
+  spentForCategory(monthKey, cat) {
+    return this.state.transactions
+      .filter(t => t.type === 'expense' && t.category === cat && t.date.startsWith(monthKey))
+      .reduce((s, t) => s + t.amount, 0);
+  }
+
+  totalSpentMonth(monthKey) {
+    return this.state.transactions.filter(t => t.type === 'expense' && t.date.startsWith(monthKey)).reduce((s, t) => s + t.amount, 0);
+  }
+  totalIncomeMonth(monthKey) {
+    return this.state.transactions.filter(t => t.type === 'income' && t.date.startsWith(monthKey)).reduce((s, t) => s + t.amount, 0);
+  }
+
+  orderedCats(cats) {
+    const order = this.state.cardOrder || [];
+    const known = order.filter(c => cats.includes(c));
+    const rest = cats.filter(c => !known.includes(c));
+    return [...known, ...rest];
+  }
+
+  moveCategory(from, to, cats) {
+    const order = this.orderedCats(cats);
+    const fromIdx = order.indexOf(from);
+    const toIdx = order.indexOf(to);
+    if (fromIdx < 0 || toIdx < 0 || fromIdx === toIdx) return;
+    order.splice(toIdx, 0, order.splice(fromIdx, 1)[0]);
+    this.setState({ cardOrder: order });
+  }
+
+  startCardDrag(e, cat, cats) {
+    const startX = e.clientX, startY = e.clientY;
+    let started = false;
+    const cleanup = () => {
+      document.removeEventListener('pointermove', move);
+      document.removeEventListener('pointerup', up);
+      document.removeEventListener('pointercancel', up);
+    };
+    const timer = setTimeout(() => { started = true; this.setState({ draggingCat: cat }); }, 180);
+    const move = (ev) => {
+      if (!started) {
+        if (Math.abs(ev.clientY - startY) > 8 || Math.abs(ev.clientX - startX) > 8) { clearTimeout(timer); cleanup(); }
+        return;
+      }
+      if (ev.cancelable) ev.preventDefault();
+      const el = document.elementFromPoint(ev.clientX, ev.clientY);
+      const target = el && el.closest ? el.closest('[data-cat]') : null;
+      if (target) {
+        const over = target.getAttribute('data-cat');
+        if (over && over !== cat) this.moveCategory(cat, over, cats);
+      }
+    };
+    const up = () => { clearTimeout(timer); cleanup(); if (started) this.setState({ draggingCat: null }); };
+    document.addEventListener('pointermove', move, { passive: false });
+    document.addEventListener('pointerup', up);
+    document.addEventListener('pointercancel', up);
+  }
+
+  setTab(tab) { this.setState({ activeTab: tab, monthPickerOpen: false, categoryPickerOpen: false }); }
+
+  openAdd() { this.setState({ addOpen: true, addAmount: '', addCategory: '', addType: 'expense', addUser: this.state.profileUser, addDate: '', addCashback: '', editingId: null }); }
+  openEdit(tx) {
+    this.setState({ addOpen: true, editingId: tx.id, addType: tx.type, addAmount: String(tx.gross || tx.amount), addCategory: tx.category, addUser: tx.user, addDate: tx.date, addAmountIsGross: true, addCashback: tx.cashback ? String(tx.cashback) : '' });
+  }
+  deleteTransaction() {
+    this.setState({ transactions: this.state.transactions.filter(t => t.id !== this.state.editingId), addOpen: false, editingId: null });
+  }
+  closeAdd() { this.setState({ addOpen: false }); }
+  setAddExpense() { this.setState({ addType: 'expense', addCategory: '' }); }
+  setAddIncome() { this.setState({ addType: 'income', addCategory: '' }); }
+
+  submitAdd() {
+    const amt = parseFloat(this.state.addAmount);
+    if (!amt || amt <= 0 || !this.state.addCategory) return;
+    const pct = this.state.addType === 'expense' ? (parseFloat(this.state.addCashback) || 0) : 0;
+    const net = Math.max(0, amt * (1 - pct / 100));
+    if (this.state.editingId) {
+      const transactions = this.state.transactions.map(t => t.id === this.state.editingId
+        ? { ...t, type: this.state.addType, amount: net, gross: amt, cashback: pct, category: this.state.addCategory, user: this.state.addUser, date: this.state.addDate || t.date }
+        : t);
+      this.setState({ transactions, addOpen: false, editingId: null, addAmount: '', addCategory: '' });
+      return;
+    }
+    const tx = {
+      id: Date.now(), type: this.state.addType, amount: net, gross: amt, cashback: pct, category: this.state.addCategory,
+      user: this.state.addUser, date: new Date().toISOString().slice(0, 16)
+    };
+    this.setState({ transactions: [tx, ...this.state.transactions], addOpen: false, addAmount: '', addCategory: '', addCashback: '' });
+  }
+
+  toggleMonthPicker() { this.setState({ monthPickerOpen: !this.state.monthPickerOpen }); }
+  selectMonth(key) { this.setState({ monthKey: key, monthPickerOpen: false, categoryPickerOpen: false }); }
+
+  openCategoryPicker() { this.setState({ categoryPickerOpen: true, newBudgetCategory: '', newBudgetAmount: '' }); }
+  closeCategoryPicker() { this.setState({ categoryPickerOpen: false }); }
+  addBudgetCategory() {
+    const cat = this.state.newBudgetCategory;
+    const amt = parseFloat(this.state.newBudgetAmount) || 0;
+    if (!cat) return;
+    const budgets = { ...this.state.budgets };
+    budgets[this.state.monthKey] = { ...(budgets[this.state.monthKey] || {}), [cat]: amt };
+    this.setState({ budgets, categoryPickerOpen: false, newBudgetCategory: '', newBudgetAmount: '' });
+  }
+  removeBudgetCategory(cat) {
+    const budgets = { ...this.state.budgets };
+    const monthBudget = { ...(budgets[this.state.monthKey] || {}) };
+    delete monthBudget[cat];
+    budgets[this.state.monthKey] = monthBudget;
+    this.setState({ budgets });
+  }
+  updateBudgetAmount(cat, val) {
+    const budgets = { ...this.state.budgets };
+    budgets[this.state.monthKey] = { ...(budgets[this.state.monthKey] || {}), [cat]: parseFloat(val) || 0 };
+    this.setState({ budgets });
+  }
+  copyFromPreviousMonth() {
+    const prev = this.prevMonthKey(this.state.monthKey);
+    const prevBudget = this.state.budgets[prev];
+    if (!prevBudget) return;
+    const budgets = { ...this.state.budgets, [this.state.monthKey]: { ...prevBudget } };
+    this.setState({ budgets });
+  }
+
+  addUser() {
+    const name = this.state.newUserName.trim();
+    if (!name || this.state.users.includes(name)) return;
+    this.setState({ users: [...this.state.users, name], newUserName: '' });
+  }
+  removeUser(name) {
+    if (this.state.users.length <= 1) return;
+    this.setState({ users: this.state.users.filter(u => u !== name) });
+  }
+  addCategory() {
+    const name = this.state.newCategoryName.trim();
+    if (!name || this.state.categories.includes(name)) return;
+    this.setState({ categories: [...this.state.categories, name], newCategoryName: '' });
+  }
+  removeCategory(name) {
+    this.setState({ categories: this.state.categories.filter(c => c !== name) });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const colors = this.getColors();
+    const monthKey = s.monthKey;
+    const budget = s.budgets[monthKey] || {};
+    const budgetCats = Object.keys(budget);
+
+    const barColorFor = (spent, amount) => {
+      if (!amount) return colors.textSecondary;
+      return spent > amount ? colors.expense : colors.income;
+    };
+    const pctStr = (spent, amount) => (amount ? Math.min(100, Math.round((spent / amount) * 100)) : 0) + '%';
+
+    const homeCats = this.orderedCats(budgetCats);
+    const homeBudgetRows = homeCats.map(cat => {
+      const spent = this.spentForCategory(monthKey, cat);
+      const left = budget[cat] - spent;
+      const dragging = s.draggingCat === cat;
+      return {
+        category: cat,
+        onPointerDown: (e) => this.startCardDrag(e, cat, budgetCats),
+        dragTransform: dragging ? 'scale(1.04)' : 'none',
+        dragShadow: dragging ? '0 14px 28px rgba(0,0,0,0.35)' : 'none',
+        dragOpacity: dragging ? '0.92' : '1',
+        dragBorder: dragging ? colors.navActive : colors.border,
+        leftBigStr: (left >= 0 ? this.fmt(left) : '-' + this.fmt(Math.abs(left))),
+        spentSmallStr: this.fmt(spent) + ' gastado',
+        pctSpentStr: (budget[cat] ? Math.round((spent / budget[cat]) * 100) : 0) + '%',
+        pctStr: pctStr(spent, budget[cat]),
+        barColor: barColorFor(spent, budget[cat])
+      };
+    });
+
+    const budgetRows = budgetCats.map(cat => {
+      const spent = this.spentForCategory(monthKey, cat);
+      return {
+        category: cat,
+        amount: budget[cat],
+        spentStr: 'gastado ' + this.fmt(spent),
+        pctStr: pctStr(spent, budget[cat]),
+        barColor: barColorFor(spent, budget[cat]),
+        color: this.categoryColor(cat),
+        icon: this.iconUrl(cat),
+        onChange: (e) => this.updateBudgetAmount(cat, e.target.value),
+        onRemove: () => this.removeBudgetCategory(cat)
+      };
+    });
+
+    const monthOptions = [];
+    for (let m = 1; m <= 12; m++) {
+      const key = `2026-${String(m).padStart(2, '0')}`;
+      monthOptions.push({ key, label: this.monthKeyLabel(key), bg: key === monthKey ? colors.chipBg : 'transparent', onSelect: () => this.selectMonth(key) });
+    }
+
+    const prevKey = this.prevMonthKey(monthKey);
+    const prevBudgetTotal = s.budgets[prevKey] ? Object.values(s.budgets[prevKey]).reduce((a, b) => a + b, 0) : null;
+    const budgetTotal = budgetCats.reduce((a, c) => a + budget[c], 0);
+    const budgetSpentTotal = budgetCats.reduce((a, c) => a + this.spentForCategory(monthKey, c), 0);
+    let budgetDeltaStr = '';
+    if (prevBudgetTotal !== null) {
+      const d = budgetTotal - prevBudgetTotal;
+      budgetDeltaStr = (d >= 0 ? '+' : '-') + this.fmt(Math.abs(d)) + ' vs mes ant.';
+    }
+
+    const availableCategories = s.categories.filter(c => !budgetCats.includes(c));
+
+    const usersRow = s.users.map(name => ({
+      name,
+      selected: name === s.profileUser ? colors.navActive : 'transparent',
+      onSelect: () => this.setState({ profileUser: name })
+    }));
+
+    const now = new Date();
+    const recentRows = [...s.transactions].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 8).map(tx => ({
+      category: tx.category, user: tx.user, dateStr: this.fmtDate(tx.date),
+      color: this.categoryColor(tx.category), icon: this.iconUrl(tx.category), onEdit: () => this.openEdit(tx), cashbackTag: tx.cashback ? ` · ${tx.cashback}% cashback` : '',
+      amountStr: (tx.type === 'income' ? '+' : '-') + this.fmt(tx.amount),
+      amountColor: tx.type === 'income' ? colors.income : colors.expense
+    }));
+
+    // filters for transactions tab
+    let filtered = s.transactions.filter(t => {
+      if (s.filterType !== 'all' && t.type !== s.filterType) return false;
+      if (s.filterCategory !== 'all' && t.category !== s.filterCategory) return false;
+      if (s.filterUser !== 'all' && t.user !== s.filterUser) return false;
+      if (s.filterFrom && t.date.slice(0, 10) < s.filterFrom) return false;
+      if (s.filterTo && t.date.slice(0, 10) > s.filterTo) return false;
+      return true;
+    });
+    if (s.sortMode === 'date') filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+    else filtered.sort((a, b) => s.sortMode === 'amountDesc' ? b.amount - a.amount : a.amount - b.amount);
+    const filteredRows = filtered.map(tx => ({
+      category: tx.category, user: tx.user, dateStr: this.fmtDate(tx.date),
+      color: this.categoryColor(tx.category), icon: this.iconUrl(tx.category), onEdit: () => this.openEdit(tx), cashbackTag: tx.cashback ? ` · ${tx.cashback}% cashback` : '',
+      amountStr: (tx.type === 'income' ? '+' : '-') + this.fmt(tx.amount),
+      amountColor: tx.type === 'income' ? colors.income : colors.expense
+    }));
+
+    const typeFilters = [
+      { key: 'all', label: 'Todos' }, { key: 'expense', label: 'Gastos' }, { key: 'income', label: 'Ingresos' }
+    ].map(f => ({
+      label: f.label,
+      bg: s.filterType === f.key ? colors.navActive : colors.surfaceCard,
+      fg: s.filterType === f.key ? colors.bg : colors.textPrimary,
+      onSelect: () => this.setState({ filterType: f.key })
+    }));
+
+    const themeOptions = [
+      { key: 'dark', label: 'Oscuro' }, { key: 'light', label: 'Claro' }, { key: 'system', label: 'Sistema' }
+    ].map(t => ({
+      label: t.label,
+      bg: s.theme === t.key ? colors.navActive : colors.surfaceCard,
+      fg: s.theme === t.key ? colors.bg : colors.textPrimary,
+      border: s.theme === t.key ? colors.navActive : colors.border,
+      onSelect: () => this.setState({ theme: t.key })
+    }));
+
+    const userRows = s.users.map(name => ({ name, onRemove: () => this.removeUser(name) }));
+    const categoryChips = s.categories.map(name => ({ name, onRemove: () => this.removeCategory(name) }));
+
+    const addCatSource = s.addType === 'expense' ? s.categories : s.incomeCategories;
+    const addCategoryOptions = addCatSource.map(name => ({
+      name, icon: this.iconUrl(name),
+      color: this.categoryColor(name) || ACCENT_CYCLE[0],
+      borderColor: s.addCategory === name ? colors.navActive : 'transparent',
+      onSelect: () => this.setState({ addCategory: name })
+    }));
+
+    const addUserOptions = s.users.map(name => ({
+      name,
+      selected: name === s.addUser,
+      bg: name === s.addUser ? colors.navActive : colors.chipBg,
+      fg: name === s.addUser ? colors.bg : colors.textPrimary,
+      border: name === s.addUser ? colors.navActive : colors.border,
+      onSelect: () => this.setState({ addUser: name })
+    }));
+
+    const hour = now.getHours();
+    const greeting = hour < 12 ? 'Buenos días' : hour < 19 ? 'Buenas tardes' : 'Buenas noches';
+
+    const addAmtNum = parseFloat(s.addAmount) || 0;
+    const addPct = parseFloat(s.addCashback) || 0;
+    const cashbackNote = addPct > 0 && addAmtNum > 0
+      ? 'Gasto final ' + this.fmt(addAmtNum * (1 - addPct / 100)) + ' · ahorrás ' + this.fmt(addAmtNum * addPct / 100)
+      : 'Descuento sobre el monto';
+
+    const totalBalance = s.transactions.reduce((sum, t) => sum + (t.type === 'income' ? t.amount : -t.amount), 0);
+
+    return {
+      state: s, colors,
+      isHome: s.activeTab === 'home', isBudget: s.activeTab === 'budget',
+      isTransactions: s.activeTab === 'transactions', isProfile: s.activeTab === 'profile',
+      goHome: () => this.setTab('home'), goBudget: () => this.setTab('budget'),
+      goTransactions: () => this.setTab('transactions'), goProfile: () => this.setTab('profile'),
+      navHomeColor: s.activeTab === 'home' ? colors.navActive : colors.navInactive,
+      navBudgetColor: s.activeTab === 'budget' ? colors.navActive : colors.navInactive,
+      navTransactionsColor: s.activeTab === 'transactions' ? colors.navActive : colors.navInactive,
+      navProfileColor: s.activeTab === 'profile' ? colors.navActive : colors.navInactive,
+      greeting, profileInitial: s.profileUser.charAt(0).toUpperCase(),
+      users: usersRow,
+      totalBalanceStr: this.fmt(totalBalance),
+      monthIncomeStr: this.fmt(this.totalIncomeMonth(monthKey)),
+      monthExpenseStr: this.fmt(this.totalSpentMonth(monthKey)),
+      monthLabel: this.monthKeyLabel(monthKey),
+      homeBudgetRows, recentRows,
+      gridTouchAction: s.draggingCat ? 'none' : 'auto',
+      openAdd: () => this.openAdd(), closeAdd: () => this.closeAdd(),
+      setAddExpense: () => this.setAddExpense(), setAddIncome: () => this.setAddIncome(),
+      addExpenseBg: s.addType === 'expense' ? colors.navActive : 'transparent',
+      addExpenseFg: s.addType === 'expense' ? colors.bg : colors.textSecondary,
+      addIncomeBg: s.addType === 'income' ? colors.navActive : 'transparent',
+      addIncomeFg: s.addType === 'income' ? colors.bg : colors.textSecondary,
+      onAddAmountChange: (e) => this.setState({ addAmount: e.target.value }),
+      onAddCashbackChange: (e) => this.setState({ addCashback: e.target.value }),
+      isExpenseAdd: s.addType === 'expense',
+      cashbackNote: cashbackNote,
+      addCategoryOptions, addUserOptions,
+      submitAdd: () => this.submitAdd(),
+      isEditing: !!s.editingId,
+      sheetTitle: s.editingId ? 'Editar movimiento' : 'Nuevo movimiento',
+      submitLabel: s.editingId ? 'Guardar cambios' : 'Registrar',
+      onAddDateChange: (e) => this.setState({ addDate: e.target.value }),
+      deleteTransaction: () => this.deleteTransaction(),
+      submitDisabled: !(parseFloat(s.addAmount) > 0 && s.addCategory),
+      submitOpacity: (parseFloat(s.addAmount) > 0 && s.addCategory) ? '1' : '0.5',
+      toggleMonthPicker: () => this.toggleMonthPicker(),
+      monthOptions,
+      budgetTotalStr: this.fmt(budgetTotal), budgetSpentStr: this.fmt(budgetSpentTotal),
+      budgetLeftStr: this.fmt(budgetTotal - budgetSpentTotal) + ' restante',
+      budgetDeltaStr, hasPrevBudget: !!s.budgets[prevKey], prevMonthLabel: this.monthKeyLabel(prevKey),
+      copyFromPreviousMonth: () => this.copyFromPreviousMonth(),
+      budgetRows,
+      openCategoryPicker: () => this.openCategoryPicker(), closeCategoryPicker: () => this.closeCategoryPicker(),
+      onNewBudgetCategoryChange: (e) => this.setState({ newBudgetCategory: e.target.value }),
+      onNewBudgetAmountChange: (e) => this.setState({ newBudgetAmount: e.target.value }),
+      addBudgetCategory: () => this.addBudgetCategory(),
+      availableCategories, showAddCategoryButton: availableCategories.length > 0 && !s.categoryPickerOpen,
+      typeFilters, categoriesList: s.categories, usersList: s.users,
+      onFilterCategoryChange: (e) => this.setState({ filterCategory: e.target.value }),
+      onFilterUserChange: (e) => this.setState({ filterUser: e.target.value }),
+      onFilterFromChange: (e) => this.setState({ filterFrom: e.target.value }),
+      onFilterToChange: (e) => this.setState({ filterTo: e.target.value }),
+      toggleSortDir: () => this.setState({ sortMode: s.sortMode === 'amountDesc' ? 'amountAsc' : s.sortMode === 'amountAsc' ? 'date' : 'amountDesc' }),
+      sortLabel: s.sortMode === 'date' ? 'Fecha ↓' : s.sortMode === 'amountDesc' ? 'Monto ↓' : 'Monto ↑',
+      filterCountLabel: `${filteredRows.length} movimiento${filteredRows.length === 1 ? '' : 's'}`,
+      filteredRows,
+      themeOptions, userRows, categoryChips,
+      onNewUserNameChange: (e) => this.setState({ newUserName: e.target.value }),
+      addUser: () => this.addUser(),
+      onNewCategoryNameChange: (e) => this.setState({ newCategoryName: e.target.value }),
+      addCategory: () => this.addCategory()
+    };
+  }
+}
+
+</script>
+</body>
+</html>
+

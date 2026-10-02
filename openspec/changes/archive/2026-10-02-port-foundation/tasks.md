@@ -101,10 +101,10 @@ each of the three port-* slices is already the finest cut the user is willing to
 > Phases 5–11 do not depend on them and can proceed in parallel. Only Phase 4.4, 11.3, and 12.4 need
 > Phase 4 complete first.
 
-- [ ] 4.1 **BLOCKING ON USER** — create the Neon Postgres project via the Vercel Marketplace free tier.
-- [ ] 4.2 **BLOCKING ON USER** — set `DATABASE_URL` (pooled/HTTP string), `APP_PASSWORD`, `SESSION_SECRET` (≥32 bytes) as Vercel project environment variables.
-- [ ] 4.3 **BLOCKING ON USER** — link the local repo to the Vercel project (`vercel link` or dashboard).
-- [ ] 4.4 **BLOCKING ON USER (needs 4.1–4.3)** — run `pnpm db:migrate` against the Neon branch; confirm all 5 tables + `transactions(date)` index exist (spec: data-persistence, "First migration applies and reverts cleanly").
+- [x] 4.1 **BLOCKING ON USER** — create the Neon Postgres project via the Vercel Marketplace free tier. _Done 2026-10-02: `transaction-manager-database`, Free, aws sa-east-1, connected to Vercel project `app-financiera`._
+- [x] 4.2 **BLOCKING ON USER** — set `DATABASE_URL` (pooled/HTTP string), `APP_PASSWORD`, `SESSION_SECRET` (≥32 bytes) as Vercel project environment variables. _Done 2026-10-02: DATABASE_URL from Neon integration (validated pooled + sslmode=require); APP_PASSWORD and SESSION_SECRET set by user._
+- [x] 4.3 **BLOCKING ON USER** — link the local repo to the Vercel project (`vercel link` or dashboard). _Done 2026-10-02 via dashboard Git import of SebaSubi/transaction-manager._
+- [x] 4.4 **BLOCKING ON USER (needs 4.1–4.3)** — run `pnpm db:migrate` against the Neon branch; confirm all 5 tables + `transactions(date)` index exist (spec: data-persistence, "First migration applies and reverts cleanly"). _Done 2026-10-02: migration applied; budgets, card_order, categories, members, transactions present; transactions_month_idx on (user_id, date). Revert not exercised against production._
 
 ## Phase 5: Domain Core (`lib/domain/`) — pure, no DB/React dependency
 
@@ -172,11 +172,11 @@ each of the three port-* slices is already the finest cut the user is willing to
 
 - [x] 11.1 `lib/db/seed/default.seed.ts`: 21 categories (18 expense + 3 income: "Sueldo", "Regalo", "Otro"), 2 members, `ON CONFLICT DO NOTHING` against the partial unique indexes, idempotent.
 - [x] 11.2 `lib/db/seed/dev.seed.ts`: 20 fixture transactions + budgets for 2026-07/2026-08; refuses to run when `DATABASE_URL` is not a Neon branch host.
-- [ ] 11.3 **BLOCKING ON USER (needs Phase 4)** — run `pnpm db:seed` against the provisioned Neon database; confirm the "Fresh database default seed" scenario (21/18/3/2 members/0 transactions/0 budgets).
+- [x] 11.3 **BLOCKING ON USER (needs Phase 4)** — run `pnpm db:seed` against the provisioned Neon database; confirm the "Fresh database default seed" scenario (21/18/3/2 members/0 transactions/0 budgets). _Done 2026-10-02: 21 categories (18 expense, 3 income), 2 members, 0 transactions, 0 budgets._
 
 ## Phase 12: Full-Suite Verification & Wiring
 
 - [x] 12.1 `pnpm install` from a clean checkout — confirm it succeeds (success criterion).
 - [x] 12.2 `pnpm test` — all domain, guard, and architecture tests pass.
 - [x] 12.3 `pnpm build` — confirm success; spot-check the `server-only` build-time enforcement (temporarily import `lib/db/client.ts` from a Client Component, confirm the build fails, then revert).
-- [ ] 12.4 **BLOCKING ON USER (needs Phase 4)** — deploy the Vercel preview; manually verify: unauthenticated request redirects to `/login`; correct password grants access, wrong password denied; all four tabs reachable; theme resolves with no flash; app reads Neon over the pooled connection.
+- [x] 12.4 **BLOCKING ON USER (needs Phase 4)** — deploy the Vercel preview; manually verify: unauthenticated request redirects to `/login`; correct password grants access, wrong password denied; all four tabs reachable; theme resolves with no flash; app reads Neon over the pooled connection. _Done 2026-10-02: production deploy verified manually by user._

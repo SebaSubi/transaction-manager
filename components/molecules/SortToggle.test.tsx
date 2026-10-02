@@ -16,7 +16,7 @@ vi.mock("next/link", () => ({
   ),
 }));
 
-const { SortToggle, nextSortMode } = await import("@/components/molecules/SortToggle");
+const { SortToggle } = await import("@/components/molecules/SortToggle");
 
 const base: LedgerQuery = {
   month: "2026-08",
@@ -27,10 +27,12 @@ const base: LedgerQuery = {
 afterEach(cleanup);
 
 describe("SortToggle", () => {
-  it("cycles date -> amount desc -> amount asc -> date", () => {
-    expect(nextSortMode("date")).toBe("amountDesc");
-    expect(nextSortMode("amountDesc")).toBe("amountAsc");
-    expect(nextSortMode("amountAsc")).toBe("date");
+  it("links the last mode back to the date sort, which is omitted from the URL", () => {
+    render(<SortToggle query={{ ...base, sort: "amountAsc" }} />);
+    const link = screen.getByRole("link", { name: "Cambiar orden" });
+
+    expect(link.textContent).toBe("Monto ↑");
+    expect(link.getAttribute("href")).toBe("/movimientos?month=2026-08");
   });
 
   it("labels the current mode and links to the next one, keeping the filters", () => {

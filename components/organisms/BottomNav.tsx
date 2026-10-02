@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { House, PiggyBank, Plus, ArrowLeftRight, User } from "lucide-react";
 
+import { useEntrySheet } from "@/components/organisms/EntrySheetProvider";
 import { Icon } from "@/components/ui/Icon";
 
 /**
@@ -20,6 +21,7 @@ const TABS = [
 
 export function BottomNav() {
   const pathname = usePathname();
+  const { openCreate } = useEntrySheet();
 
   return (
     <nav className="bottom-nav" aria-label="Navegación principal">
@@ -27,8 +29,12 @@ export function BottomNav() {
         <NavTab key={tab.href} {...tab} pathname={pathname} />
       ))}
 
-      {/* The add/edit bottom sheet lands in change 2; the FAB is chrome here. */}
-      <button type="button" className="bottom-nav__fab" aria-label="Agregar movimiento">
+      <button
+        type="button"
+        className="bottom-nav__fab"
+        aria-label="Agregar movimiento"
+        onClick={openCreate}
+      >
         <Icon as={Plus} size={26} />
       </button>
 

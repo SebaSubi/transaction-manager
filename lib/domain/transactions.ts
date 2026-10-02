@@ -1,5 +1,7 @@
+import { monthRange } from "@/lib/domain/month";
 import type {
   DomainTransaction,
+  MonthKey,
   SortMode,
   TransactionFilters,
 } from "@/lib/domain/types";
@@ -71,4 +73,29 @@ export function nextSortMode(mode: SortMode): SortMode {
     case "amountAsc":
       return "date";
   }
+}
+
+/**
+ * Clamps the optional date-from / date-to filters ('YYYY-MM-DD') to the
+ * selected month's first and last day. An unset value stays unset. Each side
+ * is clamped independently and an inverted range is NOT reordered: the result
+ * feeds `filterTransactions` unchanged and simply matches nothing.
+ */
+export function clampDateFilters(
+  month: MonthKey,
+  from: string | null,
+  to: string | null,
+): { from: string | null; to: string | null } {
+  const { start, endExclusive } = monthRange(month);
+  const first = datePart(start);
+  const last = datePart(new Date(endExclusive.getTime() - 24 * 60 * 60 * 1000));
+
+  const clamp = (value: string | null): string | null => {
+    if (value === null) return null;
+    if (value < first) return first;
+    if (value > last) return last;
+    return value;
+  };
+
+  return { from: clamp(from), to: clamp(to) };
 }

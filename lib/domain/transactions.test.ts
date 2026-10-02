@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  clampDateFilters,
   filterTransactions,
   nextSortMode,
   sortTransactions,
@@ -122,5 +123,64 @@ describe("sortTransactions", () => {
     const input = [...amounts];
     sortTransactions(input, "amountDesc");
     expect(input.map((t) => t.id)).toEqual([1, 2, 3]);
+  });
+});
+
+describe("clampDateFilters", () => {
+  it("clamps values outside the month to the month bounds", () => {
+    expect(clampDateFilters("2026-08", "2026-07-20", "2026-09-15")).toEqual({
+      from: "2026-08-01",
+      to: "2026-08-31",
+    });
+  });
+
+  it("passes in-range values through unchanged", () => {
+    expect(clampDateFilters("2026-08", "2026-08-05", "2026-08-10")).toEqual({
+      from: "2026-08-05",
+      to: "2026-08-10",
+    });
+  });
+
+  it("keeps unset values unset", () => {
+    expect(clampDateFilters("2026-08", null, null)).toEqual({ from: null, to: null });
+  });
+
+  it("clamps each side independently", () => {
+    expect(clampDateFilters("2026-02", null, "2026-03-05")).toEqual({
+      from: null,
+      to: "2026-02-28",
+    });
+    expect(clampDateFilters("2026-02", "2026-01-05", null)).toEqual({
+      from: "2026-02-01",
+      to: null,
+    });
+  });
+
+  it("does not reorder an inverted range (the filter then matches nothing)", () => {
+    const clamped = clampDateFilters("2026-08", "2026-08-20", "2026-08-10");
+    expect(clamped).toEqual({ from: "2026-08-20", to: "2026-08-10" });
+
+    const rows = filterTransactions(
+      [tx({ id: 1, date: new Date("2026-08-15T10:00:00.000Z") })],
+      {
+        type: "all",
+        categoryId: "all",
+        memberId: "all",
+        ...clamped,
+      },
+    );
+    expect(rows).toEqual([]);
+  });
+
+  it("feeds filterTransactions unchanged", () => {
+    const clamped = clampDateFilters("2026-08", "2026-07-20", "2026-09-15");
+    const rows = filterTransactions(
+      [
+        tx({ id: 1, date: new Date("2026-08-01T00:00:00.000Z") }),
+        tx({ id: 2, date: new Date("2026-08-31T23:59:00.000Z") }),
+      ],
+      { type: "all", categoryId: "all", memberId: "all", ...clamped },
+    );
+    expect(rows.map((r) => r.id)).toEqual([1, 2]);
   });
 });

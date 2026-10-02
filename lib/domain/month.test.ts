@@ -4,7 +4,9 @@ import {
   isMonthKey,
   monthKeyLabel,
   monthKeyOf,
+  monthAbbrev,
   monthRange,
+  nextMonthKey,
   prevMonthKey,
 } from "@/lib/domain/month";
 
@@ -88,5 +90,36 @@ describe("invalid month keys", () => {
     ["monthKeyOf", () => monthKeyOf(new Date("not-a-date"))],
   ])("%s throws RangeError", (_label, call) => {
     expect(call).toThrow(RangeError);
+  });
+});
+
+describe("nextMonthKey", () => {
+  it.each([
+    ["2026-12", "2027-01"],
+    ["2026-08", "2026-09"],
+    ["2026-01", "2026-02"],
+  ])("%s -> %s", (key, expected) => {
+    expect(nextMonthKey(key)).toBe(expected);
+  });
+
+  it("is symmetric with prevMonthKey", () => {
+    for (const key of ["2026-01", "2026-08", "2026-12"]) {
+      expect(prevMonthKey(nextMonthKey(key))).toBe(key);
+      expect(nextMonthKey(prevMonthKey(key))).toBe(key);
+    }
+  });
+
+  it("throws RangeError on an invalid key", () => {
+    expect(() => nextMonthKey("2026-13")).toThrow(RangeError);
+  });
+});
+
+describe("monthAbbrev", () => {
+  it.each([
+    [1, "ene"],
+    [8, "ago"],
+    [12, "dic"],
+  ])("%i -> %s", (month, expected) => {
+    expect(monthAbbrev(month)).toBe(expected);
   });
 });

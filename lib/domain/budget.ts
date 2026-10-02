@@ -33,3 +33,34 @@ export function budgetProgress(spent: number, budgeted: number): BudgetProgress 
     hasBudget: true,
   };
 }
+
+export interface PlannedBudgetRow {
+  categoryId: number;
+  amount: number;
+}
+
+/**
+ * Plans a "fill missing" budget copy. Returns the previous month's rows whose
+ * category is an ACTIVE EXPENSE category (per `activeExpenseCategoryIds`) and is
+ * absent from the current month, keeping the source amount. Existing rows are
+ * never part of the plan, so re-planning after a copy yields `[]`.
+ * Non-mutating.
+ */
+export function planBudgetCopy(
+  previous: readonly { categoryId: number; amount: number }[],
+  current: readonly { categoryId: number }[],
+  activeExpenseCategoryIds: ReadonlySet<number>,
+): PlannedBudgetRow[] {
+  const existing = new Set(current.map((row) => row.categoryId));
+  const planned = new Set<number>();
+  const plan: PlannedBudgetRow[] = [];
+
+  for (const row of previous) {
+    if (!activeExpenseCategoryIds.has(row.categoryId)) continue;
+    if (existing.has(row.categoryId) || planned.has(row.categoryId)) continue;
+    planned.add(row.categoryId);
+    plan.push({ categoryId: row.categoryId, amount: row.amount });
+  }
+
+  return plan;
+}

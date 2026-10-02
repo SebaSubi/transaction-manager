@@ -86,13 +86,13 @@ Spec: `data-persistence`. Design Decision 4. Single-statement writes only (`neon
 
 Design Decisions 2, 8, 9. Read Next docs first (task 1.2 must be done).
 
-- [ ] 4.1 RED (security hardening beyond the specs, Decision 9): create `lib/auth/requireSession.test.ts` mocking `next/headers`: `assertSession` resolves with a valid `tm_session`; throws `UnauthorizedError` for an absent, tampered (bad signature) and expired cookie; performs no database access (no repository import). Observe failure.
-- [ ] 4.2 GREEN: create `lib/auth/requireSession.ts` (`UnauthorizedError`, `assertSession` using `cookies()` and the existing `verifySession`).
-- [ ] 4.3 Create `lib/actions/state.ts` with `TransactionFormState`, `DeleteResult`, `BudgetFormState`, `BudgetMutationResult`, `CopyResult`, `INITIAL_TRANSACTION_FORM_STATE`, `INITIAL_BUDGET_FORM_STATE` exactly per the design "Interfaces / Contracts" (types live outside the `'use server'` modules, mirroring `lib/auth/loginState.ts`). Type-only and constants, verified by `pnpm exec tsc --noEmit`.
-- [ ] 4.4 Create `lib/members/cookies.ts` (`LAST_MEMBER_COOKIE = 'tm_last_member'`, `LAST_MEMBER_MAX_AGE_SECONDS = 60 * 60 * 24 * 365`).
-- [ ] 4.5 Create `lib/copy/es.ts` with the exact Spanish UI strings from the design "Spanish UI Copy" tables (sheet, Movimientos, Presupuesto). Neutral Spanish, no voseo.
-- [ ] 4.6 Run `pnpm exec vitest run lib/auth lib/actions` and `pnpm exec tsc --noEmit`; green.
-- [ ] 4.7 Commit unit 3: `feat(auth): add assertSession and action state/copy modules`.
+- [x] 4.1 RED (security hardening beyond the specs, Decision 9): create `lib/auth/requireSession.test.ts` mocking `next/headers`: `assertSession` resolves with a valid `tm_session`; throws `UnauthorizedError` for an absent, tampered (bad signature) and expired cookie; performs no database access (no repository import). Observe failure.
+- [x] 4.2 GREEN: create `lib/auth/requireSession.ts` (`UnauthorizedError`, `assertSession` using `cookies()` and the existing `verifySession`).
+- [x] 4.3 Create `lib/actions/state.ts` with `TransactionFormState`, `DeleteResult`, `BudgetFormState`, `BudgetMutationResult`, `CopyResult`, `INITIAL_TRANSACTION_FORM_STATE`, `INITIAL_BUDGET_FORM_STATE` exactly per the design "Interfaces / Contracts" (types live outside the `'use server'` modules, mirroring `lib/auth/loginState.ts`). Type-only and constants, verified by `pnpm exec tsc --noEmit`.
+- [x] 4.4 Create `lib/members/cookies.ts` (`LAST_MEMBER_COOKIE = 'tm_last_member'`, `LAST_MEMBER_MAX_AGE_SECONDS = 60 * 60 * 24 * 365`).
+- [x] 4.5 Create `lib/copy/es.ts` with the exact Spanish UI strings from the design "Spanish UI Copy" tables (sheet, Movimientos, Presupuesto). Neutral Spanish, no voseo.
+- [x] 4.6 Run `pnpm exec vitest run lib/auth lib/actions` and `pnpm exec tsc --noEmit`; green.
+- [x] 4.7 Commit unit 3: `feat(auth): add assertSession and action state/copy modules`.
 
 ## Phase 5: View Models and URL Schema (pure)
 

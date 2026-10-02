@@ -161,12 +161,12 @@ Read Next docs first (task 1.2). Spec: `app-shell-navigation`, `transaction-ledg
 
 ## Phase 10: Final Verification Gates
 
-- [ ] 10.1 Run `pnpm test` (full Vitest suite under `TZ=UTC`) and confirm all green, including `lib/domain/architecture.test.ts`, `archiveReads.test.ts`, `budgetCopy.test.ts`.
-- [ ] 10.2 Run `pnpm lint` and confirm zero errors (ESLint import-zone rules hold for `lib/view`, `lib/domain`, `components`).
-- [ ] 10.3 Run `pnpm exec tsc --noEmit` and confirm zero errors.
-- [ ] 10.4 Run `pnpm build` and confirm a successful production build.
-- [ ] 10.5 Confirm no file was added or changed under `drizzle/` and `lib/db/schema.ts` is untouched (read the working-tree diff names only; expected: none).
-- [ ] 10.6 Tick the proposal Success Criteria that are provable by automated checks (net 31000 persisted shape, income no-cashback, validation messages, wall-clock date, filters in URL, unit tests passing, no Spanish identifiers); leave UI-dependent criteria for task 11.1.
+- [x] 10.1 Run `pnpm test` (full Vitest suite under `TZ=UTC`) and confirm all green, including `lib/domain/architecture.test.ts`, `archiveReads.test.ts`, `budgetCopy.test.ts`.
+- [x] 10.2 Run `pnpm lint` and confirm zero errors (ESLint import-zone rules hold for `lib/view`, `lib/domain`, `components`).
+- [x] 10.3 Run `pnpm exec tsc --noEmit` and confirm zero errors.
+- [x] 10.4 Run `pnpm build` and confirm a successful production build.
+- [x] 10.5 Confirm no file was added or changed under `drizzle/` and `lib/db/schema.ts` is untouched (read the working-tree diff names only; expected: none).
+- [x] 10.6 Tick the proposal Success Criteria that are provable by automated checks (net 31000 persisted shape, income no-cashback, validation messages, wall-clock date, filters in URL, unit tests passing, no Spanish identifiers); leave UI-dependent criteria for task 11.1.
 
 ## Phase 11: Manual Verification on a Vercel Preview (BLOCKING ON USER)
 

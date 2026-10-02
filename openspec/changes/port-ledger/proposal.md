@@ -191,24 +191,24 @@ instant rollback to the previous deployment.
 
 ## Success Criteria
 
-- [ ] Tapping the FAB on any tab opens the add sheet; saving an expense of gross 33333 with 7%
+- [x] Tapping the FAB on any tab opens the add sheet; saving an expense of gross 33333 with 7%
       cashback persists `amount = 31000`, `gross = 33333`, `cashback_bps = 700`.
-- [ ] Income transactions cannot carry cashback, and their category set is exactly the 3 income
+- [x] Income transactions cannot carry cashback, and their category set is exactly the 3 income
       categories.
-- [ ] Gross with decimals and cashback outside 0–100 or with more than 2 decimals are rejected
+- [x] Gross with decimals and cashback outside 0–100 or with more than 2 decimals are rejected
       server-side with a Spanish message.
-- [ ] The date/time field defaults to Buenos Aires now on create and is editable; the stored date
+- [x] The date/time field defaults to Buenos Aires now on create and is editable; the stored date
       matches the entered wall-clock value.
 - [ ] "Quién" defaults to the last member used on this device, falling back to an active member.
 - [ ] "Movimientos" opens on the current month; ‹ › moves across years and into future months;
       filters and sort are reflected in the URL and survive a reload.
-- [ ] Editing a transaction with an archived category or member shows that value selected.
+- [x] Editing a transaction with an archived category or member shows that value selected.
 - [ ] Deleting a transaction requires confirmation and removes the row permanently.
-- [ ] "Presupuesto" shows expense categories only; amounts must be > 0; removing a row leaves
+- [x] "Presupuesto" shows expense categories only; amounts must be > 0; removing a row leaves
       transactions untouched.
-- [ ] "Copiar presupuesto de {mes}" adds only categories missing from the current month and never
+- [x] "Copiar presupuesto de {mes}" adds only categories missing from the current month and never
       changes an existing amount.
-- [ ] `formatArs`, `formatShortDate`, and the new validation/copy helpers have passing unit tests;
+- [x] `formatArs`, `formatShortDate`, and the new validation/copy helpers have passing unit tests;
       `lib/domain/` still imports no React, Next.js, Drizzle, or `lib/db/`.
-- [ ] `pnpm test` and `pnpm build` pass; no migration file is added under `drizzle/`.
-- [ ] No UI copy is in English; no code, identifier, or comment is in Spanish.
+- [x] `pnpm test` and `pnpm build` pass; no migration file is added under `drizzle/`.
+- [x] No UI copy is in English; no code, identifier, or comment is in Spanish.

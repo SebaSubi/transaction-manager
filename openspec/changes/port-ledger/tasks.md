@@ -74,13 +74,13 @@ Spec: `financial-domain-rules`, `transaction-entry`, `transaction-ledger`, `mont
 
 Spec: `data-persistence`. Design Decision 4. Single-statement writes only (`neon-http`, no transactions).
 
-- [ ] 3.1 RED: extend `lib/db/repositories/archiveReads.test.ts` EXPECTATIONS table with `getCategoryById` (categories repository) and `getMemberById` (members repository) as `must-include-archived`, so the test fails until the functions exist, carry the `DO NOT ADD` comment and return `archived: archivedAt !== null`. Observe failure.
-- [ ] 3.2 RED: create `lib/db/repositories/budgetCopy.test.ts` (source-level guard, same technique as `archiveReads.test.ts`): the body of `copyMissingBudgets` contains `.values(`, `onConflictDoNothing` with target `[budgets.userId, budgets.month, budgets.categoryId]` and `.returning(`, and contains none of `onConflictDoUpdate`, `.update(`, `.delete(`, `.select(`. Observe failure.
-- [ ] 3.3 GREEN: add `getCategoryById(id, userId)` to `lib/db/repositories/categories.repository.ts` and `getMemberById(id, userId)` to `lib/db/repositories/members.repository.ts` (include archived rows; `DO NOT ADD` comment; `archived: archivedAt !== null`).
-- [ ] 3.4 GREEN: add `getTransactionById`, `updateTransaction` (`UPDATE ... WHERE user_id AND id RETURNING`, null when vanished) and `deleteTransaction` (`DELETE ... RETURNING id`, boolean) to `lib/db/repositories/transactions.repository.ts`.
-- [ ] 3.5 GREEN: add `deleteBudget(month, categoryId, userId)` (never touches `transactions`) and `copyMissingBudgets(rows, toMonth, updatedAt, userId)` (single multi-row `insert().values().onConflictDoNothing({ target }).returning({ categoryId })`, returns inserted count, returns 0 without SQL on an empty plan) to `lib/db/repositories/budgets.repository.ts`.
-- [ ] 3.6 Run `pnpm exec vitest run lib/db/repositories` and `pnpm exec tsc --noEmit`; both green. Note that SQL behavior itself is not unit-tested here (no Neon test branch); it is verified in task 11.1.
-- [ ] 3.7 Commit unit 2: `feat(db): add by-id reads, transaction update/delete and budget copy repositories`.
+- [x] 3.1 RED: extend `lib/db/repositories/archiveReads.test.ts` EXPECTATIONS table with `getCategoryById` (categories repository) and `getMemberById` (members repository) as `must-include-archived`, so the test fails until the functions exist, carry the `DO NOT ADD` comment and return `archived: archivedAt !== null`. Observe failure.
+- [x] 3.2 RED: create `lib/db/repositories/budgetCopy.test.ts` (source-level guard, same technique as `archiveReads.test.ts`): the body of `copyMissingBudgets` contains `.values(`, `onConflictDoNothing` with target `[budgets.userId, budgets.month, budgets.categoryId]` and `.returning(`, and contains none of `onConflictDoUpdate`, `.update(`, `.delete(`, `.select(`. Observe failure.
+- [x] 3.3 GREEN: add `getCategoryById(id, userId)` to `lib/db/repositories/categories.repository.ts` and `getMemberById(id, userId)` to `lib/db/repositories/members.repository.ts` (include archived rows; `DO NOT ADD` comment; `archived: archivedAt !== null`).
+- [x] 3.4 GREEN: add `getTransactionById`, `updateTransaction` (`UPDATE ... WHERE user_id AND id RETURNING`, null when vanished) and `deleteTransaction` (`DELETE ... RETURNING id`, boolean) to `lib/db/repositories/transactions.repository.ts`.
+- [x] 3.5 GREEN: add `deleteBudget(month, categoryId, userId)` (never touches `transactions`) and `copyMissingBudgets(rows, toMonth, updatedAt, userId)` (single multi-row `insert().values().onConflictDoNothing({ target }).returning({ categoryId })`, returns inserted count, returns 0 without SQL on an empty plan) to `lib/db/repositories/budgets.repository.ts`.
+- [x] 3.6 Run `pnpm exec vitest run lib/db/repositories` and `pnpm exec tsc --noEmit`; both green. Note that SQL behavior itself is not unit-tested here (no Neon test branch); it is verified in task 11.1.
+- [x] 3.7 Commit unit 2: `feat(db): add by-id reads, transaction update/delete and budget copy repositories`.
 
 ## Phase 4: Auth Guard, Action State, Cookie and UI Copy
 

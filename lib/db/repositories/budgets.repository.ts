@@ -4,6 +4,7 @@ import { and, eq } from "drizzle-orm";
 
 import { db } from "@/lib/db/client";
 import { budgets } from "@/lib/db/schema";
+import type { PlannedBudgetRow } from "@/lib/domain/budget";
 import type { MonthKey } from "@/lib/domain/types";
 
 const HOUSEHOLD = "household";
@@ -47,4 +48,51 @@ export async function upsertBudget(
     })
     .returning({ categoryId: budgets.categoryId, amount: budgets.amount });
   return row;
+}
+
+/**
+ * Removes one month/category budget row. Returns `false` when it was already
+ * gone (not an error). Never touches `transactions`.
+ */
+export async function deleteBudget(
+  month: MonthKey,
+  categoryId: number,
+  userId: string = HOUSEHOLD,
+): Promise<boolean> {
+  const deleted = await db
+    .delete(budgets)
+    .where(
+      and(
+        eq(budgets.userId, userId),
+        eq(budgets.month, month),
+        eq(budgets.categoryId, categoryId),
+      ),
+    )
+    .returning({ categoryId: budgets.categoryId });
+  return deleted.length > 0;
+}
+
+/**
+ * Inserts a domain-planned budget copy as ONE multi-row statement, so it is
+ * atomic on `neon-http` without a transaction. Rows that already exist
+ * conflict on `budgets_month_category_uq` and are skipped, never overwritten.
+ * Returns the number of rows actually inserted; issues no SQL for an empty
+ * plan.
+ */
+export async function copyMissingBudgets(
+  rows: readonly PlannedBudgetRow[],
+  toMonth: MonthKey,
+  updatedAt: Date,
+  userId: string = HOUSEHOLD,
+): Promise<number> {
+  if (rows.length === 0) return 0;
+
+  const inserted = await db
+    .insert(budgets)
+    .values(rows.map((row) => ({ userId, month: toMonth, ...row, updatedAt })))
+    .onConflictDoNothing({
+      target: [budgets.userId, budgets.month, budgets.categoryId],
+    })
+    .returning({ categoryId: budgets.categoryId });
+  return inserted.length;
 }

@@ -69,6 +69,28 @@ export async function resolveMemberLabels(
   }));
 }
 
+/**
+ * BY-ID LABEL READ — deliberately INCLUDES archived members.
+ *
+ * DO NOT ADD `isNull(members.archivedAt)` HERE. The add/edit sheet needs to
+ * know whether a referenced member is archived (an edit may keep an unchanged
+ * archived value, a create may not), so it must be able to read it. Returns
+ * `null` only when the id does not exist for this user.
+ */
+export async function getMemberById(
+  id: number,
+  userId: string = HOUSEHOLD,
+): Promise<MemberLabel | null> {
+  const [row] = await db
+    .select({ id: members.id, name: members.name, archivedAt: members.archivedAt })
+    .from(members)
+    .where(and(eq(members.userId, userId), eq(members.id, id)));
+
+  if (row === undefined) return null;
+  const { archivedAt, ...label } = row;
+  return { ...label, archived: archivedAt !== null };
+}
+
 export async function createMember(
   name: string,
   userId: string = HOUSEHOLD,

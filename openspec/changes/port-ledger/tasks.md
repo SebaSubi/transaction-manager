@@ -98,16 +98,16 @@ Design Decisions 2, 8, 9. Read Next docs first (task 1.2 must be done).
 
 Spec: `transaction-ledger`, `monthly-budgets`. Design Decisions 5, 7, 11. `lib/view` imports domain and `import type` repositories only.
 
-- [ ] 5.1 RED: create `lib/view/ledger.test.ts`: `toLedgerRowView` (gross/cashback labels only for expense with cashback > 0; income has none; archived flags for category and member; `category.color === categoryColor(label.colorIndex)`; `edit` seed strings: gross, cashback via `formatPercent`, `dateValue` via `toDateTimeLocalValue`; no `Date` in the output). Create `lib/view/budgets.test.ts`: `toBudgetRowView` (same color derivation, `spentLabel` `gastado $800`, progress from `budgetProgress`, archived flag). Observe failure.
-- [ ] 5.2 GREEN: create `lib/view/ledger.ts` and `lib/view/budgets.ts`.
-- [ ] 5.3 RED: create `lib/view/ledgerOverlay.test.ts`: `reduceOverlay` for pending, remove, replace; `applyOverlay` dims pending rows, hides removed rows, swaps replaced rows with server-returned rows only; `EMPTY_OVERLAY` yields rows unchanged (base reset). Observe failure.
-- [ ] 5.4 GREEN: create `lib/view/ledgerOverlay.ts`.
-- [ ] 5.5 RED: create `lib/view/ledgerQuery.test.ts` and `lib/view/budgetQuery.test.ts`: `parseLedgerQuery` / `ledgerHref` round-trip (defaults omitted, garbage -> defaults, arrays -> first element, kebab `amount-desc` mapped to `amountDesc`, dates clamped to the month via `clampDateFilters`), `withMonth` clears from/to and keeps type/sort, `withSort`, `clearFilters` keeps month and sort; `parseBudgetMonth` falls back to the current month on an invalid param; `budgetHref`. Observe failure.
-- [ ] 5.6 GREEN: create `lib/view/ledgerQuery.ts` and `lib/view/budgetQuery.ts`.
-- [ ] 5.7 RED: create `lib/view/ledgerFilterOptions.test.ts` for `buildLedgerFilterOptions`: active-only month yields the active lists; an archived category/member referenced by the month's transactions is added and marked `archived: true`; archived entries not referenced by the month are NOT offered; duplicates by id collapsed; order is active in repository order then archived by name; **a URL filter id that matches no option is still applied by `filterTransactions` (empty filtered result) but is NOT added as an option** (assert both: option lists unchanged, and `filterTransactions` with that id returns no rows). Observe failure.
-- [ ] 5.8 GREEN: create `lib/view/ledgerFilterOptions.ts` keeping the "unknown selected id is applied but not added as an option" rule.
-- [ ] 5.9 Run `pnpm exec vitest run lib/view lib/domain/architecture.test.ts` green.
-- [ ] 5.10 Commit unit 4: `feat(view): add ledger and budget view models and URL query schema`.
+- [x] 5.1 RED: create `lib/view/ledger.test.ts`: `toLedgerRowView` (gross/cashback labels only for expense with cashback > 0; income has none; archived flags for category and member; `category.color === categoryColor(label.colorIndex)`; `edit` seed strings: gross, cashback via `formatPercent`, `dateValue` via `toDateTimeLocalValue`; no `Date` in the output). Create `lib/view/budgets.test.ts`: `toBudgetRowView` (same color derivation, `spentLabel` `gastado $800`, progress from `budgetProgress`, archived flag). Observe failure.
+- [x] 5.2 GREEN: create `lib/view/ledger.ts` and `lib/view/budgets.ts`.
+- [x] 5.3 RED: create `lib/view/ledgerOverlay.test.ts`: `reduceOverlay` for pending, remove, replace; `applyOverlay` dims pending rows, hides removed rows, swaps replaced rows with server-returned rows only; `EMPTY_OVERLAY` yields rows unchanged (base reset). Observe failure.
+- [x] 5.4 GREEN: create `lib/view/ledgerOverlay.ts`.
+- [x] 5.5 RED: create `lib/view/ledgerQuery.test.ts` and `lib/view/budgetQuery.test.ts`: `parseLedgerQuery` / `ledgerHref` round-trip (defaults omitted, garbage -> defaults, arrays -> first element, kebab `amount-desc` mapped to `amountDesc`, dates clamped to the month via `clampDateFilters`), `withMonth` clears from/to and keeps type/sort, `withSort`, `clearFilters` keeps month and sort; `parseBudgetMonth` falls back to the current month on an invalid param; `budgetHref`. Observe failure.
+- [x] 5.6 GREEN: create `lib/view/ledgerQuery.ts` and `lib/view/budgetQuery.ts`.
+- [x] 5.7 RED: create `lib/view/ledgerFilterOptions.test.ts` for `buildLedgerFilterOptions`: active-only month yields the active lists; an archived category/member referenced by the month's transactions is added and marked `archived: true`; archived entries not referenced by the month are NOT offered; duplicates by id collapsed; order is active in repository order then archived by name; **a URL filter id that matches no option is still applied by `filterTransactions` (empty filtered result) but is NOT added as an option** (assert both: option lists unchanged, and `filterTransactions` with that id returns no rows). Observe failure.
+- [x] 5.8 GREEN: create `lib/view/ledgerFilterOptions.ts` keeping the "unknown selected id is applied but not added as an option" rule.
+- [x] 5.9 Run `pnpm exec vitest run lib/view lib/domain/architecture.test.ts` green.
+- [x] 5.10 Commit unit 4: `feat(view): add ledger and budget view models and URL query schema`.
 
 ## Phase 6: Server Actions (RED tests first, then implementation)
 

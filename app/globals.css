@@ -418,15 +418,23 @@ a {
   font-weight: 600;
 }
 
+/* Reads as a plain value; still editable on tap. 13ch fits "999.999.999". */
 .budget-row__amount {
-  width: 96px;
-  padding: 6px 8px;
+  width: 13ch;
+  padding: 2px 0;
   color: var(--text-primary);
   font: inherit;
+  font-variant-numeric: tabular-nums;
   text-align: right;
-  background: var(--chip-bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+}
+
+.budget-row__amount:focus {
+  outline: none;
+  border-bottom-color: var(--border);
 }
 
 .budget-row__remove {

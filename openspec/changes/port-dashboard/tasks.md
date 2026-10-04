@@ -33,7 +33,7 @@
 
 ## Phase 1: Dependency install
 
-- [ ] 1.1 Run `pnpm add @dnd-kit/core@6.3.1 @dnd-kit/sortable@10.0.0` (exact pins, no caret). Confirm `package.json` shows exact versions and `pnpm-lock.yaml` changed. Do not import `@dnd-kit/utilities`. Spec: home-dashboard (reorder).
+- [x] 1.1 Run `pnpm add @dnd-kit/core@6.3.1 @dnd-kit/sortable@10.0.0` (exact pins, no caret). Confirm `package.json` shows exact versions and `pnpm-lock.yaml` changed. Do not import `@dnd-kit/utilities`. Spec: home-dashboard (reorder).
 - [ ] 1.2 Verify the design.md open question against the installed typings in `node_modules/@dnd-kit/core` and `node_modules/@dnd-kit/sortable`: (a) the `aria-describedby` value is `DndDescribedBy-` plus the `DndContext` `id` prop; (b) `useSortable` accepts `attributes.roleDescription`; (c) whether `PointerSensor` can ignore touch pointers without a custom subclass (otherwise keep `MouseSensor` plus `TouchSensor`). Record the findings as a note at the top of the `SortableCategoryGrid.tsx` task (4.6) in this file. Spec: home-dashboard (accessibility).
 
 ## Phase 2: Domain foundation (RED tests first)

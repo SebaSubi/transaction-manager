@@ -85,11 +85,11 @@
 
 ## Phase 8: Final gates
 
-- [ ] 8.1 `pnpm test` green.
-- [ ] 8.2 `pnpm lint` green.
-- [ ] 8.3 `pnpm exec tsc --noEmit` green.
-- [ ] 8.4 `pnpm build` green, run with the dummy env vars from the Conventions section.
-- [ ] 8.5 `git diff --stat main -- drizzle/` prints nothing (no migration). Also confirm `architecture.test.ts` and `archiveReads.test.ts` passed in 8.1.
+- [x] 8.1 `pnpm test` green.
+- [x] 8.2 `pnpm lint` green.
+- [x] 8.3 `pnpm exec tsc --noEmit` green.
+- [x] 8.4 `pnpm build` green, run with the dummy env vars from the Conventions section.
+- [x] 8.5 `git diff --stat main -- drizzle/` prints nothing (no migration). Also confirm `architecture.test.ts` and `archiveReads.test.ts` passed in 8.1.
 
 ## Phase 9: Manual verification on the Vercel preview (BLOCKING ON USER)
 

@@ -16,7 +16,7 @@ vi.mock("next/headers", () => ({
   }),
 }));
 
-const { default: RootLayout } = await import("@/app/layout");
+const { default: RootLayout, viewport, metadata } = await import("@/app/layout");
 
 /**
  * Renders the root layout exactly as the server would and returns the HTML.
@@ -169,5 +169,16 @@ describe("theme boot script", () => {
     // A boot script that throws would abort before paint and strand the guess.
     expect(() => runBootScript()).not.toThrow();
     matchMedia = installMatchMedia(true);
+  });
+});
+
+describe("installed home-screen app on iOS", () => {
+  it("opts into safe-area insets so the bottom nav clears the home indicator", () => {
+    // Without viewport-fit=cover, iOS reports env(safe-area-inset-bottom) as 0.
+    expect(viewport.viewportFit).toBe("cover");
+  });
+
+  it("declares itself a standalone web app with a non-translucent status bar", () => {
+    expect(metadata.appleWebApp).toMatchObject({ capable: true, statusBarStyle: "default" });
   });
 });

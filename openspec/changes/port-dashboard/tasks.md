@@ -74,8 +74,8 @@
 
 ## Phase 6: Perfil organisms and screens
 
-- [ ] 6.1 Organisms with jsdom tests and mocked actions: `MemberSettings` (add form, archive opens `ConfirmDialog`, cancel calls nothing, confirm calls once, field errors), `CategorySettings` (add with `IconPicker`, `RenameForm` per row, archive confirm), `ArchivedSection` (both kinds, restore without confirmation, per-row error, empty message), `ThemeSwitch` (preference selected, three options, change calls `setTheme` with the mapped value, revert on rejection, `applyThemeToDocument`). Spec: household-settings, theming.
-- [ ] 6.2 Screens with tests: `HomeScreen` (greeting, balance label, no month stepper, empty grid and empty recent states independently) and `ProfileScreen`. Spec: home-dashboard, household-settings, app-shell-navigation.
+- [x] 6.1 Organisms with jsdom tests and mocked actions: `MemberSettings` (add form, archive opens `ConfirmDialog`, cancel calls nothing, confirm calls once, field errors), `CategorySettings` (add with `IconPicker`, `RenameForm` per row, archive confirm), `ArchivedSection` (both kinds, restore without confirmation, per-row error, empty message), `ThemeSwitch` (preference selected, three options, change calls `setTheme` with the mapped value, revert on rejection, `applyThemeToDocument`). Spec: household-settings, theming.
+- [x] 6.2 Screens with tests: `HomeScreen` (greeting, balance label, no month stepper, empty grid and empty recent states independently) and `ProfileScreen`. Spec: home-dashboard, household-settings, app-shell-navigation.
 
 ## Phase 7: Page containers and shell tests
 

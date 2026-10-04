@@ -57,11 +57,7 @@ chrome, the bottom nav, and the add/edit sheet host so the FAB and list rows ope
 ## REMOVED Requirements
 
 ### Requirement: Placeholder screens only
-
-(Reason: "Movimientos" and "Presupuesto" are now functional and the FAB opens the add sheet; the
-replacement requirement is "Tab screens".)
-(Migration: replaced by "Tab screens" above; only "Inicio" and "Perfil" remain placeholders until
-change 3.)
+(Reason: "Movimientos" and "Presupuesto" are now functional and the FAB opens the add sheet; the replacement requirement is "Tab screens". Migration: replaced by "Tab screens" above; only "Inicio" and "Perfil" remain placeholders until change 3.)
 
 ## ADDED Requirements
 

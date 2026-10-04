@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, eq, inArray, isNull } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNotNull, isNull } from "drizzle-orm";
 
 import { db } from "@/lib/db/client";
 import { categories } from "@/lib/db/schema";
@@ -156,4 +156,73 @@ export async function archiveCategory(
         isNull(categories.archivedAt),
       ),
     );
+}
+
+/**
+ * Renames an ACTIVE category of the given kind. Sets only `name`; icon, colour,
+ * kind and `archived_at` are untouched. `null` means no row matched (vanished,
+ * wrong kind or archived). A duplicate active name rejects with 23505.
+ */
+export async function renameCategory(
+  id: number,
+  kind: TransactionType,
+  name: string,
+  userId: string = HOUSEHOLD,
+): Promise<CategoryRow | null> {
+  const [row] = await db
+    .update(categories)
+    .set({ name })
+    .where(
+      and(
+        eq(categories.id, id),
+        eq(categories.userId, userId),
+        eq(categories.kind, kind),
+        isNull(categories.archivedAt),
+      ),
+    )
+    .returning(CATEGORY_COLUMNS);
+  return row ?? null;
+}
+
+/**
+ * Restores an ARCHIVED category of the given kind. Sets only `archived_at`.
+ * `null` means no row matched (vanished, wrong kind or already active). An
+ * active category with the same name rejects with 23505.
+ */
+export async function unarchiveCategory(
+  id: number,
+  kind: TransactionType,
+  userId: string = HOUSEHOLD,
+): Promise<CategoryRow | null> {
+  const [row] = await db
+    .update(categories)
+    .set({ archivedAt: null })
+    .where(
+      and(
+        eq(categories.id, id),
+        eq(categories.userId, userId),
+        eq(categories.kind, kind),
+        isNotNull(categories.archivedAt),
+      ),
+    )
+    .returning(CATEGORY_COLUMNS);
+  return row ?? null;
+}
+
+/** The Archivadas read: archived categories of one kind, newest archive first. */
+export async function listArchivedCategories(
+  kind: TransactionType,
+  userId: string = HOUSEHOLD,
+): Promise<CategoryRow[]> {
+  return db
+    .select(CATEGORY_COLUMNS)
+    .from(categories)
+    .where(
+      and(
+        eq(categories.userId, userId),
+        eq(categories.kind, kind),
+        isNotNull(categories.archivedAt),
+      ),
+    )
+    .orderBy(desc(categories.archivedAt), desc(categories.id));
 }

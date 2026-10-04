@@ -28,6 +28,25 @@ export async function getCardOrder(userId: string = HOUSEHOLD): Promise<number[]
 }
 
 /**
+ * The RAW stored order: every `card_order` row, archived categories INCLUDED
+ * (deliberately no join). `replaceCardOrder` deletes the whole order, so a
+ * reorder must merge against this read; merging against `getCardOrder()` would
+ * silently delete the positions of archived categories, and a restored
+ * category would lose its place.
+ */
+export async function getStoredCardOrder(
+  userId: string = HOUSEHOLD,
+): Promise<number[]> {
+  const rows = await db
+    .select({ categoryId: cardOrder.categoryId })
+    .from(cardOrder)
+    .where(eq(cardOrder.userId, userId))
+    .orderBy(asc(cardOrder.position), asc(cardOrder.categoryId));
+
+  return rows.map((row) => row.categoryId);
+}
+
+/**
  * Replaces the whole order in ONE round trip.
  *
  * `neon-http` is non-interactive: `db.transaction(callback)` is unavailable

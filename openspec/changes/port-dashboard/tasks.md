@@ -79,9 +79,9 @@
 
 ## Phase 7: Page containers and shell tests
 
-- [ ] 7.1 RED then GREEN: `app/(shell)/inicio/page.test.ts` then `page.tsx` per the Inicio data flow in design.md (single month read, `monthBalance`, `buildHomeCards`, recent 5 mapped with `toLedgerRowView`). Spec: home-dashboard.
-- [ ] 7.2 RED then GREEN: `app/(shell)/perfil/page.test.ts` then `page.tsx` (active and archived members and expense categories, `tm_theme` cookie preference via async `cookies()`). Spec: household-settings, theming.
-- [ ] 7.3 Review the existing layout test and the `BottomNav` test; update them if the new Inicio and Perfil content or the spec deltas under app-shell-navigation affect their expectations (no weakening of existing assertions). Spec: app-shell-navigation.
+- [x] 7.1 RED then GREEN: `app/(shell)/inicio/page.test.ts` then `page.tsx` per the Inicio data flow in design.md (single month read, `monthBalance`, `buildHomeCards`, recent 5 mapped with `toLedgerRowView`). Spec: home-dashboard.
+- [x] 7.2 RED then GREEN: `app/(shell)/perfil/page.test.ts` then `page.tsx` (active and archived members and expense categories, `tm_theme` cookie preference via async `cookies()`). Spec: household-settings, theming.
+- [x] 7.3 Review the existing layout test and the `BottomNav` test; update them if the new Inicio and Perfil content or the spec deltas under app-shell-navigation affect their expectations (no weakening of existing assertions). Spec: app-shell-navigation.
 
 ## Phase 8: Final gates
 

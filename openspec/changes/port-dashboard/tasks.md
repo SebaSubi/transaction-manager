@@ -95,13 +95,13 @@
 
 > Blocking on user. The agent cannot run this. The preview uses the PRODUCTION database (Neon preview branching is unavailable), so every record created here is real data and MUST be cleaned up afterward. Use clearly named test data such as names starting with "ZZ prueba".
 
-- [ ] 9.1 Drag to reorder on a real phone: press and hold a card (about 180 ms) to lift it and drag; a quick swipe still scrolls the page; no iOS callout or text selection appears on long press; the order persists after reload and a failed save reverts with the Spanish message. Also check desktop mouse drag and keyboard reorder.
-- [ ] 9.2 Inicio: the this-month balance equals income minus expense for the current month; the 5 recent movements are shown newest first, and tapping one opens the edit sheet.
-- [ ] 9.3 Categories in Perfil: add with the icon picker, rename, archive (confirm dialog), and restore from Archivadas; the archived category disappears from the Inicio grid and returns with its previous position when restored.
-- [ ] 9.4 Members in Perfil: add, archive, restore; archiving the last active member is blocked with the Spanish message.
-- [ ] 9.5 Duplicate names: creating, renaming, or restoring into an existing active name shows the duplicate message and writes nothing.
-- [ ] 9.6 Theme switch: Oscuro, Claro, Sistema change the palette immediately and persist after reload.
-- [ ] 9.7 Cleanup on the production database: remove or archive all test members and categories, restore any real item that was archived for testing, and restore the original card order. Confirm the user reports completion before archive.
+- [x] 9.1 Drag to reorder on a real phone: press and hold a card (about 180 ms) to lift it and drag; a quick swipe still scrolls the page; no iOS callout or text selection appears on long press; the order persists after reload and a failed save reverts with the Spanish message. Also check desktop mouse drag and keyboard reorder.
+- [x] 9.2 Inicio: the this-month balance equals income minus expense for the current month; the 5 recent movements are shown newest first, and tapping one opens the edit sheet.
+- [x] 9.3 Categories in Perfil: add with the icon picker, rename, archive (confirm dialog), and restore from Archivadas; the archived category disappears from the Inicio grid and returns with its previous position when restored.
+- [x] 9.4 Members in Perfil: add, archive, restore; archiving the last active member is blocked with the Spanish message.
+- [x] 9.5 Duplicate names: creating, renaming, or restoring into an existing active name shows the duplicate message and writes nothing.
+- [x] 9.6 Theme switch: Oscuro, Claro, Sistema change the palette immediately and persist after reload.
+- [x] 9.7 Cleanup on the production database: remove or archive all test members and categories, restore any real item that was archived for testing, and restore the original card order. Confirm the user reports completion before archive.
 
 ## Suggested work-unit commits (single PR, commit by commit review)
 
@@ -120,3 +120,5 @@ Note on ordering: commit 4 depends on commits 2 and 3, and commit 5 depends on c
 
 - Sequential: 0.x, then 1.1 before 4.6; 2.x before 3.x and 5.x; 3.x before 5.x; 5.x before 6.x and 7.x; 8.x after everything; 9.x after 8.x and a deployed preview.
 - Parallel-safe once Phase 2 is done: Phase 3 and tasks 4.1 to 4.4 (disjoint files); 4.5 to 4.7 with Phase 5; 6.1 with 7.1.
+
+_Phase 9 result 2026-10-04: user confirmed "everything went perfect" on the feat/port-dashboard preview (run against the production database; Neon preview branching unavailable). Leftover check: 21 categories match the seed, 2 original members active, 0 transactions; 1 budget remained (handled separately)._

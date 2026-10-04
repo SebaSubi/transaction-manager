@@ -99,6 +99,28 @@ export async function resolveCategoryLabels(
   }));
 }
 
+/**
+ * BY-ID LABEL READ — deliberately INCLUDES archived categories.
+ *
+ * DO NOT ADD `isNull(categories.archivedAt)` HERE. The add/edit sheet needs to
+ * know whether a referenced category is archived (an edit may keep an
+ * unchanged archived value, a create may not), so it must be able to read it.
+ * Returns `null` only when the id does not exist for this user.
+ */
+export async function getCategoryById(
+  id: number,
+  userId: string = HOUSEHOLD,
+): Promise<CategoryLabel | null> {
+  const [row] = await db
+    .select({ ...CATEGORY_COLUMNS, archivedAt: categories.archivedAt })
+    .from(categories)
+    .where(and(eq(categories.userId, userId), eq(categories.id, id)));
+
+  if (row === undefined) return null;
+  const { archivedAt, ...label } = row;
+  return { ...label, archived: archivedAt !== null };
+}
+
 export async function createCategory(
   input: {
     name: string;

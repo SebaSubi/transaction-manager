@@ -1,8 +1,12 @@
 import type { MonthKey, MonthRange } from "@/lib/domain/types";
 
 /**
- * The single permitted Spanish string table in `lib/domain/`. The alternative
- * is duplicating twelve month names across three screens (design §5).
+ * One of the two sanctioned Spanish string tables in `lib/domain/` (the other
+ * is `VALIDATION_MESSAGES` in `lib/domain/messages.ts`). This one exists
+ * because the alternative is duplicating twelve month names across three
+ * screens (design §5). `VALIDATION_MESSAGES` exists because the
+ * `financial-domain-rules` spec requires the pure validation helpers to return
+ * per-field Spanish messages themselves.
  */
 const MONTHS_ES = [
   "Enero",
@@ -65,6 +69,17 @@ export function monthKeyLabel(key: MonthKey): string {
 export function prevMonthKey(key: MonthKey): MonthKey {
   const { year, month } = partsOf(key);
   return month === 1 ? keyOf(year - 1, 12) : keyOf(year, month - 1);
+}
+
+/** '2026-12' -> '2027-01'. Symmetric to `prevMonthKey`; no fixed range. */
+export function nextMonthKey(key: MonthKey): MonthKey {
+  const { year, month } = partsOf(key);
+  return month === 12 ? keyOf(year + 1, 1) : keyOf(year, month + 1);
+}
+
+/** 1-based month -> three-letter lowercase abbreviation (1 -> 'ene'). */
+export function monthAbbrev(month: number): string {
+  return MONTHS_ES[month - 1].slice(0, 3).toLowerCase();
 }
 
 /**

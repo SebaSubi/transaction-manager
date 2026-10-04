@@ -1,6 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { nowInBuenosAires, wallClockFromParts } from "@/lib/domain/time";
+import {
+  nowInBuenosAires,
+  parseDateTimeLocal,
+  toDateTimeLocalValue,
+  wallClockFromParts,
+} from "@/lib/domain/time";
 
 afterEach(() => {
   vi.useRealTimers();
@@ -42,5 +47,54 @@ describe("wallClockFromParts", () => {
     expect(wallClockFromParts(2026, 1, 1, 0, 0).toISOString()).toBe(
       "2026-01-01T00:00:00.000Z",
     );
+  });
+});
+
+describe("toDateTimeLocalValue", () => {
+  it("renders the Buenos Aires wall clock without shifting it", () => {
+    vi.useFakeTimers();
+    // 2026-08-15T00:00Z is 21:00 on 2026-08-14 in Buenos Aires.
+    vi.setSystemTime(new Date("2026-08-15T00:00:00.000Z"));
+
+    expect(toDateTimeLocalValue(nowInBuenosAires())).toBe("2026-08-14T21:00");
+  });
+
+  it("zero-pads every component", () => {
+    expect(toDateTimeLocalValue(wallClockFromParts(2026, 1, 5, 7, 3))).toBe(
+      "2026-01-05T07:03",
+    );
+  });
+});
+
+describe("parseDateTimeLocal", () => {
+  it("parses a valid value into a wall-clock Date", () => {
+    expect(parseDateTimeLocal("2026-08-14T21:00")?.toISOString()).toBe(
+      "2026-08-14T21:00:00.000Z",
+    );
+  });
+
+  it("stores the entered wall clock unchanged under TZ=UTC", () => {
+    const parsed = parseDateTimeLocal("2026-03-01T00:30");
+    expect(parsed?.getUTCHours()).toBe(0);
+    expect(parsed?.getUTCMinutes()).toBe(30);
+  });
+
+  it("drops optional seconds", () => {
+    expect(parseDateTimeLocal("2026-08-14T21:00:45")?.toISOString()).toBe(
+      "2026-08-14T21:00:00.000Z",
+    );
+  });
+
+  it.each([
+    "2026-02-30T10:00",
+    "2026-13-01T10:00",
+    "2026-08-14T24:00",
+    "2026-08-14T10:60",
+    "",
+    "garbage",
+    "2026-08-14",
+    "2026-08-14 10:00",
+  ])("rejects %j", (value) => {
+    expect(parseDateTimeLocal(value)).toBeNull();
   });
 });

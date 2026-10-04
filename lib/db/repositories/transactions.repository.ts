@@ -83,3 +83,48 @@ export async function createTransaction(
     .returning(TRANSACTION_COLUMNS);
   return row;
 }
+
+/** One transaction by id, or `null` when it does not exist for this user. */
+export async function getTransactionById(
+  id: number,
+  userId: string = HOUSEHOLD,
+): Promise<DomainTransaction | null> {
+  const [row] = await db
+    .select(TRANSACTION_COLUMNS)
+    .from(transactions)
+    .where(and(eq(transactions.userId, userId), eq(transactions.id, id)));
+  return row ?? null;
+}
+
+/**
+ * One-statement `UPDATE ... WHERE user_id AND id RETURNING`. Returns `null`
+ * when the row vanished (deleted from another device), never throws for it.
+ */
+export async function updateTransaction(
+  id: number,
+  input: NewTransaction,
+  userId: string = HOUSEHOLD,
+): Promise<DomainTransaction | null> {
+  const [row] = await db
+    .update(transactions)
+    .set(input)
+    .where(and(eq(transactions.userId, userId), eq(transactions.id, id)))
+    .returning(TRANSACTION_COLUMNS);
+  return row ?? null;
+}
+
+/**
+ * One-statement `DELETE ... RETURNING id`. Returns `false` when the row was
+ * already gone; that is not an error (deleting twice must not lose data or
+ * fail).
+ */
+export async function deleteTransaction(
+  id: number,
+  userId: string = HOUSEHOLD,
+): Promise<boolean> {
+  const deleted = await db
+    .delete(transactions)
+    .where(and(eq(transactions.userId, userId), eq(transactions.id, id)))
+    .returning({ id: transactions.id });
+  return deleted.length > 0;
+}

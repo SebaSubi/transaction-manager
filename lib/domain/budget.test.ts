@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { budgetProgress } from "@/lib/domain/budget";
+import { budgetProgress, planBudgetCopy } from "@/lib/domain/budget";
 
 describe("budgetProgress", () => {
   it("caps the bar percentage at 100 when overspent", () => {
@@ -43,5 +43,52 @@ describe("budgetProgress", () => {
   it("computes remaining, which may be negative", () => {
     expect(budgetProgress(800, 1000).remaining).toBe(200);
     expect(budgetProgress(1500, 1000).remaining).toBe(-500);
+  });
+});
+
+describe("planBudgetCopy", () => {
+  const active = new Set([1, 2, 3]);
+
+  it("plans only categories missing from the current month, keeping the source amount", () => {
+    const plan = planBudgetCopy(
+      [
+        { categoryId: 1, amount: 100 },
+        { categoryId: 2, amount: 200 },
+      ],
+      [{ categoryId: 1 }],
+      active,
+    );
+    expect(plan).toEqual([{ categoryId: 2, amount: 200 }]);
+  });
+
+  it("skips archived and non-expense categories via the active-expense id set", () => {
+    const plan = planBudgetCopy(
+      [
+        { categoryId: 1, amount: 100 },
+        { categoryId: 9, amount: 900 },
+      ],
+      [],
+      active,
+    );
+    expect(plan).toEqual([{ categoryId: 1, amount: 100 }]);
+  });
+
+  it("is idempotent: re-planning against the copied month yields nothing", () => {
+    const previous = [
+      { categoryId: 1, amount: 100 },
+      { categoryId: 2, amount: 200 },
+    ];
+    const first = planBudgetCopy(previous, [], active);
+    expect(planBudgetCopy(previous, first, active)).toEqual([]);
+  });
+
+  it("returns an empty plan for an empty source month", () => {
+    expect(planBudgetCopy([], [{ categoryId: 1 }], active)).toEqual([]);
+  });
+
+  it("does not mutate its inputs", () => {
+    const previous = [{ categoryId: 1, amount: 100 }];
+    const frozen = Object.freeze([...previous]);
+    expect(() => planBudgetCopy(frozen, Object.freeze([]), active)).not.toThrow();
   });
 });

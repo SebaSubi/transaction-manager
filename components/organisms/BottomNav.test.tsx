@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const pathname = vi.hoisted(() => ({ current: "/inicio" }));
@@ -25,6 +25,15 @@ vi.mock("next/link", () => ({
 }));
 
 const { BottomNav } = await import("@/components/organisms/BottomNav");
+const { EntrySheetProvider, useEntrySheet } = await import(
+  "@/components/organisms/EntrySheetProvider"
+);
+
+/** Exposes the sheet state so the FAB's effect is observable without the sheet. */
+function SheetProbe() {
+  const { open, mode } = useEntrySheet();
+  return <output data-testid="sheet-state">{open ? `open:${mode}` : "closed"}</output>;
+}
 
 /** Spec: exactly these four labels, verbatim Spanish product copy, in order. */
 const EXPECTED_TABS = [
@@ -36,7 +45,12 @@ const EXPECTED_TABS = [
 
 function renderAt(path: string) {
   pathname.current = path;
-  return render(<BottomNav />);
+  return render(
+    <EntrySheetProvider categories={[]} members={[]} defaultMemberId={null}>
+      <BottomNav />
+      <SheetProbe />
+    </EntrySheetProvider>,
+  );
 }
 
 afterEach(() => {
@@ -86,6 +100,15 @@ describe("BottomNav", () => {
     expect(slots.indexOf(fab)).toBe(2);
     expect(slots[1].textContent).toBe("Presupuesto");
     expect(slots[3].textContent).toBe("Movimientos");
+  });
+
+  it("opens the create sheet from the FAB through openCreate()", () => {
+    renderAt("/inicio");
+    expect(screen.getByTestId("sheet-state").textContent).toBe("closed");
+
+    fireEvent.click(screen.getByRole("button", { name: "Agregar movimiento" }));
+
+    expect(screen.getByTestId("sheet-state").textContent).toBe("open:create");
   });
 
   it.each(EXPECTED_TABS.map((tab) => [tab.href, tab.label] as const))(

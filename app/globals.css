@@ -102,7 +102,7 @@ a {
 
 .shell__content {
   flex: 1;
-  padding: 20px 16px calc(88px + env(safe-area-inset-bottom));
+  padding: calc(20px + env(safe-area-inset-top)) 16px calc(88px + env(safe-area-inset-bottom));
 }
 
 .screen__title {
@@ -829,21 +829,27 @@ a {
   border-radius: 14px;
 }
 
+/* Wraps the actions onto their own line when the name and buttons don't fit,
+   instead of letting the name overflow underneath them. */
 .settings-row__main {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   align-items: center;
 }
 
 .settings-row__name {
-  flex: 1;
+  flex: 1 1 8rem;
   min-width: 0;
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
 .settings-row__actions {
   display: flex;
+  flex-shrink: 0;
   gap: 8px;
+  margin-left: auto;
 }
 
 .rename-form,

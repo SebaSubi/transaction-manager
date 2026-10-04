@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
 
 import { isThemePreference, resolveTheme } from "@/lib/domain/theme";
@@ -14,6 +14,16 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Transaction Manager",
   description: "Gastos compartidos del hogar",
+  appleWebApp: { capable: true, title: "Transaction Manager", statusBarStyle: "default" },
+};
+
+// `viewportFit: "cover"` is what makes iOS report real `env(safe-area-inset-*)`
+// values. Without it they are 0, and when the app is launched from the home
+// screen the bottom nav sits inside the home-indicator gesture area.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default async function RootLayout({

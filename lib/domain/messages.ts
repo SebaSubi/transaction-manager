@@ -30,4 +30,19 @@ export const VALIDATION_MESSAGES = {
   budgetSaveFailed: "No se pudo guardar el presupuesto.",
   budgetRemoveFailed: "No se pudo quitar la categoría.",
   budgetCopyFailed: "No se pudo copiar el presupuesto.",
+  nameRequired: "El nombre es obligatorio.",
+  nameTooLong: "El nombre puede tener hasta 40 caracteres.",
+  iconRequired: "Falta elegir un ícono.",
+  memberNameTaken: "Ya existe una persona activa con ese nombre.",
+  memberRestoreNameTaken:
+    "No se puede restaurar: ya existe una persona activa con ese nombre.",
+  memberMissing: "La persona ya no existe.",
+  lastActiveMember: "No se puede archivar a la última persona activa.",
+  categoryNameTaken: "Ya existe una categoría activa con ese nombre.",
+  categoryRestoreNameTaken:
+    "No se puede restaurar: ya existe una categoría activa con ese nombre.",
+  categoryNotManaged: "Solo se pueden gestionar categorías de gastos.",
+  archiveFailed: "No se pudo archivar.",
+  restoreFailed: "No se pudo restaurar.",
+  cardOrderSaveFailed: "No se pudo guardar el orden.",
 } as const;

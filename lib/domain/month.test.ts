@@ -5,6 +5,7 @@ import {
   monthKeyLabel,
   monthKeyOf,
   monthAbbrev,
+  monthNameOf,
   monthRange,
   nextMonthKey,
   prevMonthKey,
@@ -121,5 +122,19 @@ describe("monthAbbrev", () => {
     [12, "dic"],
   ])("%i -> %s", (month, expected) => {
     expect(monthAbbrev(month)).toBe(expected);
+  });
+});
+
+describe("monthNameOf", () => {
+  it.each([
+    ["2026-01", "Enero"],
+    ["2026-10", "Octubre"],
+    ["2026-12", "Diciembre"],
+  ] as const)("names %s as %s", (key, name) => {
+    expect(monthNameOf(key)).toBe(name);
+  });
+
+  it("throws on an invalid key", () => {
+    expect(() => monthNameOf("2026-13")).toThrow(RangeError);
   });
 });

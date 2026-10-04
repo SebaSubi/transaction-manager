@@ -86,6 +86,39 @@ export function parsePositiveId(raw: unknown): number | null {
   return Number.isSafeInteger(value) && value > 0 ? value : null;
 }
 
+export const NAME_MAX_LENGTH = 40;
+
+/** Trims a display name; blank, non-string and over-long (by code point) fail. */
+export function parseName(raw: unknown): ParseResult<string, "name"> {
+  if (typeof raw !== "string") return { ok: false, errors: { name: M.nameRequired } };
+  const trimmed = raw.trim();
+  if (trimmed === "") return { ok: false, errors: { name: M.nameRequired } };
+  if ([...trimmed].length > NAME_MAX_LENGTH) {
+    return { ok: false, errors: { name: M.nameTooLong } };
+  }
+  return { ok: true, value: trimmed };
+}
+
+/**
+ * A list of positive ids, deduplicated (first occurrence wins), or `null` when
+ * the input is not an array, is longer than `max` (checked before
+ * deduplication) or holds any invalid id.
+ */
+export function parseIdList(raw: unknown, max: number): number[] | null {
+  if (!Array.isArray(raw) || raw.length > max) return null;
+  const seen = new Set<number>();
+  const ids: number[] = [];
+  for (const item of raw) {
+    const id = parsePositiveId(item);
+    if (id === null) return null;
+    if (!seen.has(id)) {
+      seen.add(id);
+      ids.push(id);
+    }
+  }
+  return ids;
+}
+
 function parseType(raw: string | undefined): TransactionType | null {
   return raw === "expense" || raw === "income" ? raw : null;
 }

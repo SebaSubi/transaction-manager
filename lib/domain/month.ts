@@ -94,3 +94,9 @@ export function monthRange(key: MonthKey): MonthRange {
     endExclusive: new Date(Date.UTC(year, month, 1)),
   };
 }
+
+/** '2026-10' -> 'Octubre'. */
+export function monthNameOf(key: MonthKey): string {
+  const { month } = partsOf(key);
+  return MONTHS_ES[month - 1];
+}

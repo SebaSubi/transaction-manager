@@ -6,6 +6,9 @@ import {
   checkTransactionReferences,
   parseBudgetAmount,
   parseCashbackBps,
+  NAME_MAX_LENGTH,
+  parseIdList,
+  parseName,
   parsePositiveId,
   parseTransactionForm,
   parseWholePesos,
@@ -314,5 +317,67 @@ describe("checkBudgetCategory", () => {
     expect(checkBudgetCategory({ kind: "expense", archived: true }, false)).toBe(
       M.categoryUnavailable,
     );
+  });
+});
+
+describe("parseName", () => {
+  it("trims and preserves inner whitespace", () => {
+    expect(parseName("  Ana  María ")).toEqual({ ok: true, value: "Ana  María" });
+  });
+
+  it.each([["" ], ["   "], [undefined], [null], [5], [{}]])("requires a name for %j", (raw) => {
+    expect(parseName(raw)).toEqual({ ok: false, errors: { name: M.nameRequired } });
+  });
+
+  it("accepts exactly 40 code points and rejects 41", () => {
+    expect(parseName("a".repeat(NAME_MAX_LENGTH))).toEqual({
+      ok: true,
+      value: "a".repeat(NAME_MAX_LENGTH),
+    });
+    expect(parseName("a".repeat(NAME_MAX_LENGTH + 1))).toEqual({
+      ok: false,
+      errors: { name: M.nameTooLong },
+    });
+  });
+
+  it("counts accented names and astral characters by code point", () => {
+    expect(parseName("é".repeat(40)).ok).toBe(true);
+    expect(parseName("😀".repeat(40)).ok).toBe(true);
+    expect(parseName("😀".repeat(41)).ok).toBe(false);
+  });
+
+  it("measures the trimmed value", () => {
+    expect(parseName(` ${"a".repeat(40)} `).ok).toBe(true);
+  });
+});
+
+describe("parseIdList", () => {
+  it("accepts a list of positive integers", () => {
+    expect(parseIdList([3, 1, 2], 10)).toEqual([3, 1, 2]);
+  });
+
+  it("accepts integer strings like parsePositiveId", () => {
+    expect(parseIdList(["3", 1], 10)).toEqual([3, 1]);
+  });
+
+  it("removes duplicates, first occurrence wins", () => {
+    expect(parseIdList([2, 1, 2, 1], 10)).toEqual([2, 1]);
+  });
+
+  it("returns an empty list for an empty array", () => {
+    expect(parseIdList([], 10)).toEqual([]);
+  });
+
+  it.each([["1,2"], [{}], [null], [undefined], [5], [[-1]], [[1.5]], [[1, "x"]], [[0]], [[{}]]])(
+    "rejects %j",
+    (raw) => {
+      expect(parseIdList(raw, 10)).toBeNull();
+    },
+  );
+
+  it("rejects lists longer than max, measured before deduplication", () => {
+    expect(parseIdList([1, 2, 3], 2)).toBeNull();
+    expect(parseIdList([1, 1, 1], 2)).toBeNull();
+    expect(parseIdList([1, 2], 2)).toEqual([1, 2]);
   });
 });

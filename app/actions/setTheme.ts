@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 
+import { assertSession } from "@/lib/auth/requireSession";
 import { isThemePreference } from "@/lib/domain/theme";
 import { THEME_COOKIE, THEME_MAX_AGE_SECONDS } from "@/lib/theme/cookies";
 
@@ -17,6 +18,10 @@ import { THEME_COOKIE, THEME_MAX_AGE_SECONDS } from "@/lib/theme/cookies";
  * 'system' are ever written.
  */
 export async function setTheme(preference: unknown): Promise<void> {
+  // FIRST statement: a Server Action is reachable by a direct POST, so the
+  // session is verified before anything is validated, read or written.
+  await assertSession();
+
   if (!isThemePreference(preference)) {
     throw new Error(`Invalid theme preference: ${String(preference)}`);
   }

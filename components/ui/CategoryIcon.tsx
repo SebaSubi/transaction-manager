@@ -25,13 +25,15 @@ import {
 } from "lucide-react";
 
 import { Icon } from "@/components/ui/Icon";
+import { isCategoryIconKey, type CategoryIconKey } from "@/lib/domain/categoryIcons";
 
 /**
- * Static map of the seeded category icon names (`lib/db/seed/categories.ts`) to
- * bundled lucide components. Nothing is imported dynamically and nothing is
+ * Static map of the pickable category icon keys (`CATEGORY_ICON_KEYS`) to
+ * bundled lucide components; the record type makes the compiler enforce exactly
+ * those keys. Nothing is imported dynamically and nothing is
  * fetched at runtime, so the whole icon set never reaches the bundle.
  */
-const ICONS: Readonly<Record<string, LucideIcon>> = {
+const ICONS: Readonly<Record<CategoryIconKey, LucideIcon>> = {
   "shopping-cart": ShoppingCart,
   "key-round": KeyRound,
   lightbulb: Lightbulb,
@@ -66,6 +68,6 @@ export function CategoryIcon({
   /** A `var(--accent-N)` reference from `categoryColor()`. */
   color?: string;
 }) {
-  const component = Object.hasOwn(ICONS, name) ? ICONS[name] : Tag;
+  const component = isCategoryIconKey(name) ? ICONS[name] : Tag;
   return <Icon as={component} size={size} color={color} />;
 }

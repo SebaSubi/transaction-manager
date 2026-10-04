@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, eq, inArray, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 
 import { db } from "@/lib/db/client";
 import { members } from "@/lib/db/schema";
@@ -134,4 +134,38 @@ export async function archiveMember(
       `Cannot archive member ${id}: it is either already archived or the last active member.`,
     );
   }
+}
+
+/**
+ * Restores an ARCHIVED member. Sets only `archived_at`. `null` means no row
+ * matched (vanished or already active). An active member with the same name
+ * rejects with 23505.
+ */
+export async function unarchiveMember(
+  id: number,
+  userId: string = HOUSEHOLD,
+): Promise<MemberRow | null> {
+  const [row] = await db
+    .update(members)
+    .set({ archivedAt: null })
+    .where(
+      and(
+        eq(members.id, id),
+        eq(members.userId, userId),
+        isNotNull(members.archivedAt),
+      ),
+    )
+    .returning({ id: members.id, name: members.name });
+  return row ?? null;
+}
+
+/** The Archivadas read: archived members, newest archive first. */
+export async function listArchivedMembers(
+  userId: string = HOUSEHOLD,
+): Promise<MemberRow[]> {
+  return db
+    .select({ id: members.id, name: members.name })
+    .from(members)
+    .where(and(eq(members.userId, userId), isNotNull(members.archivedAt)))
+    .orderBy(desc(members.archivedAt), desc(members.id));
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { spentForCategory, totalBalance } from "@/lib/domain/balance";
+import { monthBalance, spentForCategory, totalBalance } from "@/lib/domain/balance";
 import type { DomainTransaction } from "@/lib/domain/types";
 
 function tx(overrides: Partial<DomainTransaction> & { id: number }): DomainTransaction {
@@ -77,5 +77,52 @@ describe("totalBalance", () => {
     expect(
       totalBalance([tx({ id: 1, type: "expense", amount: 100, gross: 100 })]),
     ).toBe(-100);
+  });
+});
+
+describe("monthBalance", () => {
+  const mk = (type: "income" | "expense", amount: number, date: string): DomainTransaction => ({
+    id: 1,
+    type,
+    amount,
+    gross: amount,
+    cashbackBps: 0,
+    categoryId: 1,
+    memberId: 1,
+    date: new Date(`${date}Z`),
+  });
+
+  it("is income minus expense using net amounts", () => {
+    expect(
+      monthBalance(
+        [mk("income", 1000, "2026-10-05T10:00"), mk("expense", 300, "2026-10-06T10:00")],
+        "2026-10",
+      ),
+    ).toBe(700);
+  });
+
+  it("uses half-open boundaries", () => {
+    expect(
+      monthBalance(
+        [
+          mk("income", 100, "2026-10-01T00:00"),
+          mk("income", 1000, "2026-11-01T00:00"),
+          mk("income", 10_000, "2026-09-30T23:59"),
+        ],
+        "2026-10",
+      ),
+    ).toBe(100);
+  });
+
+  it("ignores rows outside the range even when passed in", () => {
+    expect(monthBalance([mk("expense", 500, "2026-08-10T10:00")], "2026-10")).toBe(0);
+  });
+
+  it("returns 0 for empty input", () => {
+    expect(monthBalance([], "2026-10")).toBe(0);
+  });
+
+  it("can be negative", () => {
+    expect(monthBalance([mk("expense", 250, "2026-10-02T10:00")], "2026-10")).toBe(-250);
   });
 });

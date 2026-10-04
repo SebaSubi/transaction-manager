@@ -23,7 +23,11 @@ import { describe, expect, it } from "vitest";
 
 const REPOSITORY_DIR = path.resolve(__dirname);
 
-type FilterExpectation = "must-filter-archived" | "must-include-archived" | "not-a-read";
+type FilterExpectation =
+  | "must-filter-archived"
+  | "must-include-archived"
+  | "must-only-archived"
+  | "not-a-read";
 
 const EXPECTATIONS: Record<string, Record<string, FilterExpectation>> = {
   "categories.repository.ts": {
@@ -33,6 +37,9 @@ const EXPECTATIONS: Record<string, Record<string, FilterExpectation>> = {
     getCategoryById: "must-include-archived",
     createCategory: "not-a-read",
     archiveCategory: "must-filter-archived",
+    renameCategory: "must-filter-archived",
+    unarchiveCategory: "must-only-archived",
+    listArchivedCategories: "must-only-archived",
   },
   "members.repository.ts": {
     listActiveMembers: "must-filter-archived",
@@ -40,6 +47,8 @@ const EXPECTATIONS: Record<string, Record<string, FilterExpectation>> = {
     getMemberById: "must-include-archived",
     createMember: "not-a-read",
     archiveMember: "must-filter-archived",
+    unarchiveMember: "must-only-archived",
+    listArchivedMembers: "must-only-archived",
   },
 };
 
@@ -81,9 +90,22 @@ function exportedFunctionBodies(source: string): Map<string, string> {
  * own warning ("DO NOT ADD `isNull(...)`"). A raw substring scan would read
  * that warning as the very filter it warns against.
  */
+function stripComments(body: string): string {
+  return body.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
+}
+
 function filtersArchived(body: string): boolean {
-  const code = body.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
+  const code = stripComments(body);
   return /isNull\(\s*(?:categories|members)\.archivedAt\s*\)/.test(code);
+}
+
+/** `isNotNull(<table>.archivedAt)` present and no `isNull(...)` filter. */
+function onlyArchived(body: string): boolean {
+  const code = stripComments(body);
+  return (
+    /isNotNull\(\s*(?:categories|members)\.archivedAt\s*\)/.test(code) &&
+    !/isNull\(/.test(code)
+  );
 }
 
 describe.each(Object.entries(EXPECTATIONS))(
@@ -118,6 +140,14 @@ describe.each(Object.entries(EXPECTATIONS))(
       expect(body).toContain("DO NOT ADD");
       // The caller must be able to render it AS archived, not as a live row.
       expect(body).toMatch(/archived:\s*archivedAt !== null/);
+    });
+
+    it.each(
+      Object.entries(expectations).filter(
+        ([, rule]) => rule === "must-only-archived",
+      ),
+    )("%s only touches archived rows", (name) => {
+      expect(onlyArchived(bodies.get(name)!)).toBe(true);
     });
   },
 );

@@ -41,6 +41,23 @@ export type CopyResult =
   | { status: "nothing" }
   | { status: "error"; message: string };
 
+export type NameField = "name" | "icon" | "id";
+
+export type NameFormState =
+  | { status: "idle" }
+  | {
+      status: "error";
+      fieldErrors: Partial<Record<NameField, string>>;
+      formError: string | null;
+    }
+  | { status: "saved"; id: number; name: string };
+
+export type MutationResult =
+  | { status: "ok" }
+  | { status: "error"; message: string };
+
+export const INITIAL_NAME_FORM_STATE: NameFormState = { status: "idle" };
+
 export const INITIAL_TRANSACTION_FORM_STATE: TransactionFormState = {
   status: "idle",
 };

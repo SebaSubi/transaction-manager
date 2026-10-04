@@ -46,6 +46,31 @@ export async function listTransactionsInRange(
     .orderBy(desc(transactions.date), desc(transactions.id));
 }
 
+const DEFAULT_RECENT_LIMIT = 5;
+const MAX_RECENT_LIMIT = 50;
+
+/**
+ * The newest transactions across ALL dates (not just the current month), for
+ * the Inicio "Últimos movimientos" list. The limit is clamped to 1..50 and a
+ * non-finite value falls back to 5. `id DESC` is the deterministic tiebreaker,
+ * identical to `listTransactionsInRange`.
+ */
+export async function listRecentTransactions(
+  limit: number = DEFAULT_RECENT_LIMIT,
+  userId: string = HOUSEHOLD,
+): Promise<DomainTransaction[]> {
+  const safeLimit = Number.isFinite(limit)
+    ? Math.min(MAX_RECENT_LIMIT, Math.max(1, Math.trunc(limit)))
+    : DEFAULT_RECENT_LIMIT;
+
+  return db
+    .select(TRANSACTION_COLUMNS)
+    .from(transactions)
+    .where(eq(transactions.userId, userId))
+    .orderBy(desc(transactions.date), desc(transactions.id))
+    .limit(safeLimit);
+}
+
 /**
  * Every transaction ever recorded, ascending. `totalBalance()` spans all
  * history rather than the selected month (obs #59), so it needs this read.

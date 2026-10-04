@@ -1,4 +1,5 @@
-import type { DomainTransaction } from "@/lib/domain/types";
+import { monthRange } from "@/lib/domain/month";
+import type { DomainTransaction, MonthKey } from "@/lib/domain/types";
 
 /**
  * Nets income against expense across EVERY transaction supplied.
@@ -36,4 +37,25 @@ export function spentForCategory(
     }
   }
   return spent;
+}
+
+/**
+ * Income minus expense (NET amounts) for one month. Only rows inside the
+ * half-open `monthRange(monthKey)` count, so the result is correct even when
+ * the caller passes a wider slice.
+ */
+export function monthBalance(
+  transactions: readonly DomainTransaction[],
+  monthKey: MonthKey,
+): number {
+  const { start, endExclusive } = monthRange(monthKey);
+  const from = start.getTime();
+  const to = endExclusive.getTime();
+  let balance = 0;
+  for (const transaction of transactions) {
+    const at = transaction.date.getTime();
+    if (at < from || at >= to) continue;
+    balance += transaction.type === "income" ? transaction.amount : -transaction.amount;
+  }
+  return balance;
 }

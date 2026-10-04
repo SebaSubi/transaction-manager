@@ -67,8 +67,10 @@ swap the set and MUST clear a category selection that does not belong to the new
 
 ### Requirement: Whole-peso gross validation
 
-Gross MUST be a whole number of pesos greater than 0. A value with decimals MUST be rejected with a
-Spanish message and nothing persisted. Validation MUST run server-side regardless of any client
+Gross MUST be a whole number of pesos greater than 0. Plain digits and valid es-AR thousands
+grouping with dots (`1.500`, `12.000.000`) MUST be accepted; the dots are stripped. A value with
+decimals (including malformed grouping such as `1.5`, `1.50`, `1.5000`, `.500`, `1..500`) MUST be
+rejected with a Spanish message and nothing persisted. Validation MUST run server-side regardless of any client
 checks.
 
 #### Scenario: Whole-peso gross accepted
@@ -76,6 +78,18 @@ checks.
 - GIVEN gross=33333
 - WHEN the create action is submitted with otherwise valid input
 - THEN the transaction MUST be persisted with `gross = 33333`
+
+#### Scenario: Thousands-grouped gross accepted
+
+- GIVEN gross="12.000.000" (the entry input shows digits grouped with dots while typing)
+- WHEN the create action is submitted with otherwise valid input
+- THEN the transaction MUST be persisted with `gross = 12000000`
+
+#### Scenario: Gross input groups digits while typing
+
+- GIVEN the user types `12000000` in the gross input
+- THEN the input MUST display `12.000.000`
+- AND a value containing a comma MUST be left as typed so the validation message shows
 
 #### Scenario: Decimal gross rejected
 

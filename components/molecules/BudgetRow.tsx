@@ -8,6 +8,7 @@ import { ArchivedTag } from "@/components/ui/ArchivedTag";
 import { FieldError } from "@/components/ui/FieldError";
 import { Icon } from "@/components/ui/Icon";
 import { ProgressBar } from "@/components/ui/ProgressBar";
+import { formatPesoInput, normalizePesoInput } from "@/lib/domain/format";
 import { budgetAmountAriaLabel, budgetRemoveAriaLabel } from "@/lib/copy/es";
 import type { BudgetRowView } from "@/lib/view/budgets";
 
@@ -27,7 +28,7 @@ export function BudgetRow({
   onRemove: (categoryId: number) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const initial = String(row.amount);
+  const initial = formatPesoInput(String(row.amount));
 
   function commit() {
     const value = inputRef.current?.value.trim() ?? initial;
@@ -61,6 +62,9 @@ export function BudgetRow({
             className="budget-row__amount"
             aria-label={budgetAmountAriaLabel(row.name)}
             defaultValue={initial}
+            onChange={(event) => {
+              event.target.value = normalizePesoInput(event.target.value);
+            }}
             onBlur={commit}
           />
         </form>

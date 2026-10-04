@@ -158,6 +158,7 @@ Read Next docs first (task 1.2). Spec: `app-shell-navigation`, `transaction-ledg
 - [x] 9.8 Update or add page-level tests where the existing suite covers `app/(shell)/movimientos` / `presupuesto` placeholders (replace placeholder assertions); run `pnpm exec vitest run app components/organisms/BottomNav.test.tsx` green.
 - [x] 9.9 Run `pnpm exec tsc --noEmit` and `pnpm build` (explicit build, not implied) to confirm the dynamic pages compile with awaited `searchParams`.
 - [x] 9.10 Commit unit 7: `feat(shell): wire movimientos, presupuesto and the add sheet`.
+- [x] 9.11 Group thousands in the peso inputs (sheet gross, budget row amount, budget add amount) with es-AR dots; `parseWholePesos` accepts valid grouping (`1.500`) and still rejects decimals (from user preview feedback). Domain helpers `formatPesoInput` / `normalizePesoInput` with RED tests first; delta specs updated. Commit: `fix(ui): group thousands in peso inputs`.
 
 ## Phase 10: Final Verification Gates
 

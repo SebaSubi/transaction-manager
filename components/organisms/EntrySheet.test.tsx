@@ -222,7 +222,7 @@ describe("EntrySheet (edit)", () => {
     setup({ edit: row });
 
     expect(screen.getByText("Editar movimiento")).toBeDefined();
-    expect((screen.getByLabelText("Monto") as HTMLInputElement).value).toBe("33333");
+    expect((screen.getByLabelText("Monto") as HTMLInputElement).value).toBe("33.333");
     expect((screen.getByLabelText("Cashback") as HTMLInputElement).value).toBe("7");
     expect((screen.getByLabelText("Fecha y hora") as HTMLInputElement).value).toBe("2026-08-14T21:00");
     expect(screen.getByRole("radio", { name: "Super" }).getAttribute("aria-checked")).toBe("true");

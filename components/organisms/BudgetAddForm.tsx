@@ -10,6 +10,7 @@ import {
   INITIAL_BUDGET_FORM_STATE,
   type BudgetFormState,
 } from "@/lib/actions/state";
+import { normalizePesoInput } from "@/lib/domain/format";
 import type { MonthKey } from "@/lib/domain/types";
 
 /**
@@ -88,6 +89,9 @@ function AddFields({
         className="input"
         aria-label={BUDGET_COPY.addAmount}
         placeholder={BUDGET_COPY.addAmount}
+        onChange={(event) => {
+          event.target.value = normalizePesoInput(event.target.value);
+        }}
       />
       <FieldError message={errors.amount} />
       <FieldError message={state.status === "error" ? state.formError : null} />

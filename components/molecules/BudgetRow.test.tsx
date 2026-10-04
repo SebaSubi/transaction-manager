@@ -44,7 +44,24 @@ describe("BudgetRow", () => {
     fireEvent.change(input, { target: { value: "1500" } });
     fireEvent.submit(input.form!);
 
-    expect(onAmountChange).toHaveBeenCalledExactlyOnceWith(4, "1500");
+    expect(onAmountChange).toHaveBeenCalledExactlyOnceWith(4, "1.500");
+  });
+
+  it("loads the saved amount grouped with thousands dots", () => {
+    const { input } = setup({ amount: 12000000 });
+    expect(input.value).toBe("12.000.000");
+  });
+
+  it("groups digits as the user types", () => {
+    const { input } = setup();
+    fireEvent.change(input, { target: { value: "12000000" } });
+    expect(input.value).toBe("12.000.000");
+  });
+
+  it("leaves a value with a comma as typed", () => {
+    const { input } = setup();
+    fireEvent.change(input, { target: { value: "1500,50" } });
+    expect(input.value).toBe("1500,50");
   });
 
   it("submits a changed amount on blur", () => {
@@ -53,7 +70,7 @@ describe("BudgetRow", () => {
     fireEvent.change(input, { target: { value: "2000" } });
     fireEvent.blur(input);
 
-    expect(onAmountChange).toHaveBeenCalledExactlyOnceWith(4, "2000");
+    expect(onAmountChange).toHaveBeenCalledExactlyOnceWith(4, "2.000");
   });
 
   it("does not submit when the amount is unchanged", () => {

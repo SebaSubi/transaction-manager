@@ -77,7 +77,9 @@ uncapped, over-budget color switch. Amounts MUST be formatted with `formatArs`.
 
 ### Requirement: Budget amount validation
 
-A budget amount MUST be a whole number of pesos greater than 0. Zero, negative, decimal, or
+A budget amount MUST be a whole number of pesos greater than 0. Plain digits and valid thousands
+grouping with dots (`12.000.000`) MUST be accepted, and the budget amount inputs MUST display digits
+grouped with dots as the user types and when a saved value loads. Zero, negative, decimal, or
 non-numeric amounts MUST be rejected server-side with a Spanish message and nothing persisted.
 
 #### Scenario: Valid amount saved
@@ -85,6 +87,12 @@ non-numeric amounts MUST be rejected server-side with a Spanish message and noth
 - GIVEN an amount of 50000 for an active expense category in 2026-08
 - WHEN the upsert action runs
 - THEN a budget row for that month and category MUST exist with amount 50000
+
+#### Scenario: Thousands-grouped amount saved
+
+- GIVEN an amount of "12.000.000" for an active expense category
+- WHEN the upsert action runs
+- THEN the budget amount MUST be stored as 12000000
 
 #### Scenario: Zero rejected
 

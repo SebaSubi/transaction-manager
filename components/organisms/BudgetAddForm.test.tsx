@@ -33,6 +33,18 @@ describe("BudgetAddForm", () => {
     expect(screen.queryByRole("option", { name: "Gas" })).toBeNull();
   });
 
+  it("groups digits in the amount as the user types and leaves commas alone", () => {
+    render(<BudgetAddForm month="2026-08" categories={categories} budgetedIds={[1]} />);
+    fireEvent.click(screen.getByRole("button", { name: "+ Agregar categoría" }));
+    const amount = screen.getByLabelText("Monto") as HTMLInputElement;
+
+    fireEvent.change(amount, { target: { value: "12000000" } });
+    expect(amount.value).toBe("12.000.000");
+
+    fireEvent.change(amount, { target: { value: "1500,50" } });
+    expect(amount.value).toBe("1500,50");
+  });
+
   it("is hidden when every category already has a budget", () => {
     const { container } = render(
       <BudgetAddForm month="2026-08" categories={categories} budgetedIds={[1, 2, 3]} />,

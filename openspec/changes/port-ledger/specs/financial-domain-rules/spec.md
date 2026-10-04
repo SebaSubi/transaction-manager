@@ -48,7 +48,8 @@ label, without any timezone conversion.
 
 ### Requirement: Transaction input parsing
 
-Pure helpers MUST parse and validate transaction input: gross as a whole peso > 0; cashback as 0 to
+Pure helpers MUST parse and validate transaction input: gross as a whole peso > 0 (plain digits or
+valid `\d{1,3}(\.\d{3})+` thousands grouping, dots stripped; any other `.` or `,` is rejected); cashback as 0 to
 100 inclusive with at most 2 decimals converted to integer basis points (empty means 0); income
 forcing cashback to 0; date as a valid wall-clock timestamp. Failures MUST return per-field
 Spanish messages and MUST NOT throw.
@@ -58,6 +59,19 @@ Spanish messages and MUST NOT throw.
 - GIVEN inputs "33333", "100.5", "0", "abc"
 - WHEN gross is parsed
 - THEN "33333" MUST be accepted as 33333 and the others MUST each yield a gross error
+
+#### Scenario: Thousands grouping accepted, decimals rejected
+
+- GIVEN inputs "1.500", "12.000.000", "1.5", "1.50", "1,5", "1.5000", ".500", "1..500"
+- WHEN gross (or a budget amount) is parsed
+- THEN "1.500" and "12.000.000" MUST be accepted as 1500 and 12000000 and the rest MUST each be rejected
+
+#### Scenario: Peso input display helpers
+
+- GIVEN `formatPesoInput("12000000")`
+- THEN it MUST return "12.000.000"
+- AND `normalizePesoInput` MUST re-group digit-and-dot text, and MUST return text containing a comma
+  or any other non-digit unchanged (never silently dropping it)
 
 #### Scenario: Cashback to basis points
 

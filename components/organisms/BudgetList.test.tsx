@@ -87,7 +87,7 @@ describe("BudgetList", () => {
     const form = actions.upsert.mock.calls[0][1] as FormData;
     expect(form.get("month")).toBe("2026-08");
     expect(form.get("categoryId")).toBe("4");
-    expect(form.get("amount")).toBe("1500");
+    expect(form.get("amount")).toBe("1.500");
   });
 
   it("shows the server's amount error and does not trust the typed value", async () => {

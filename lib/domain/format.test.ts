@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import {
   formatArs,
   formatPercent,
+  formatPesoInput,
+  normalizePesoInput,
   formatShortDate,
   formatSignedArs,
 } from "@/lib/domain/format";
@@ -51,4 +53,35 @@ describe("formatPercent", () => {
   ])("%i bps -> %s", (bps, expected) => {
     expect(formatPercent(bps)).toBe(expected);
   });
+});
+
+describe("formatPesoInput", () => {
+  it.each([
+    ["", ""],
+    ["5", "5"],
+    ["500", "500"],
+    ["1500", "1.500"],
+    ["12000000", "12.000.000"],
+  ])("%j -> %j", (raw, expected) => {
+    expect(formatPesoInput(raw)).toBe(expected);
+  });
+});
+
+describe("normalizePesoInput", () => {
+  it.each([
+    ["12000000", "12.000.000"],
+    ["12.000.0000", "120.000.000"],
+    ["1.500", "1.500"],
+    ["1.50", "150"],
+    ["", ""],
+  ])("regroups %j -> %j", (raw, expected) => {
+    expect(normalizePesoInput(raw)).toBe(expected);
+  });
+
+  it.each(["1500,50", "33,5", "abc", "12abc", "-5", "1 500", "."])(
+    "leaves %j unchanged so server validation shows",
+    (raw) => {
+      expect(normalizePesoInput(raw)).toBe(raw);
+    },
+  );
 });

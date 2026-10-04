@@ -44,9 +44,13 @@ export function parseWholePesos(raw: string | undefined): ParseResult<number, "v
   const text = (raw ?? "").trim();
   if (text === "") return { ok: false, errors: { value: M.grossRequired } };
   if (/^-\d+$/.test(text)) return { ok: false, errors: { value: M.grossNotPositive } };
-  if (!/^\d+$/.test(text)) return { ok: false, errors: { value: M.grossNotWhole } };
+  // Plain digits, or valid es-AR thousands grouping ('1.500', '12.000.000').
+  const plain = /^\d+$/.test(text);
+  if (!plain && !/^\d{1,3}(\.\d{3})+$/.test(text)) {
+    return { ok: false, errors: { value: M.grossNotWhole } };
+  }
 
-  const value = Number(text);
+  const value = Number(plain ? text : text.replace(/\./g, ""));
   if (value === 0) return { ok: false, errors: { value: M.grossNotPositive } };
   if (value > MAX_WHOLE_PESOS) return { ok: false, errors: { value: M.grossTooLarge } };
   return { ok: true, value };

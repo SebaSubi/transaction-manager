@@ -10,6 +10,22 @@ function groupThousands(digits: string): string {
   return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 
+/** Raw digits for display while typing: '12000000' -> '12.000.000'. */
+export function formatPesoInput(digits: string): string {
+  return groupThousands(digits);
+}
+
+/**
+ * Normalizes a peso input while typing: keeps digits and re-groups them with
+ * dots. Anything else (a comma, letters, a minus, spaces) is returned unchanged
+ * so server-side validation shows its message; a comma is never dropped.
+ */
+export function normalizePesoInput(text: string): string {
+  if (/[^\d.]/.test(text)) return text;
+  const digits = text.replace(/\./g, "");
+  return digits === "" ? text : formatPesoInput(digits);
+}
+
 /** 1234567 -> '$1.234.567'; -5000 -> '-$5.000'. Whole pesos, never rounded. */
 export function formatArs(amount: number): string {
   const sign = amount < 0 ? "-" : "";

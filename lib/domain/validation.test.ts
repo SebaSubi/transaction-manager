@@ -19,13 +19,23 @@ describe("parseWholePesos", () => {
     ["  500  ", 500],
     ["1", 1],
     ["999999999", 999_999_999],
+    ["1.500", 1500],
+    ["33.333", 33333],
+    ["12.000.000", 12_000_000],
+    ["  1.500  ", 1500],
   ])("accepts %j", (raw, value) => {
     expect(parseWholePesos(raw)).toEqual({ ok: true, value });
   });
 
   it.each([
-    ["33.333", M.grossNotWhole],
     ["33,5", M.grossNotWhole],
+    ["1.5", M.grossNotWhole],
+    ["1.50", M.grossNotWhole],
+    ["1,5", M.grossNotWhole],
+    ["1.5000", M.grossNotWhole],
+    [".500", M.grossNotWhole],
+    ["1..500", M.grossNotWhole],
+    ["1.500,5", M.grossNotWhole],
     ["1.", M.grossNotWhole],
     ["abc", M.grossNotWhole],
     ["12abc", M.grossNotWhole],
@@ -189,6 +199,10 @@ describe("parseTransactionForm", () => {
 describe("parseBudgetAmount", () => {
   it("accepts a whole positive amount", () => {
     expect(parseBudgetAmount("150000")).toEqual({ ok: true, value: 150000 });
+  });
+
+  it("accepts thousands grouping with dots", () => {
+    expect(parseBudgetAmount("12.000.000")).toEqual({ ok: true, value: 12_000_000 });
   });
 
   it.each(["1.5", "0", "-3", "", undefined, "abc", "1000000000"])(

@@ -36,25 +36,6 @@ in create mode from any tab.
 - WHEN the sheet is dismissed without saving
 - THEN the route and its search params MUST be unchanged
 
-### Requirement: Tab screens
-
-"Movimientos" and "Presupuesto" MUST render their functional screens (the transaction ledger and
-the monthly budgets). "Inicio" and "Perfil" MUST remain empty placeholder screens in this change.
-(Previously: all four tab routes rendered empty placeholders and no sheet, CRUD, or filters existed.)
-
-#### Scenario: Placeholder tabs still render
-
-- GIVEN a valid session
-- WHEN `inicio` or `perfil` is requested
-- THEN the route MUST render successfully with placeholder content only
-
-#### Scenario: Functional tabs render their screens
-
-- GIVEN a valid session
-- WHEN `movimientos` or `presupuesto` is requested
-- THEN the route MUST render the ledger or the budgets screen respectively, with no placeholder
-  content
-
 ### Requirement: Shared shell layout
 
 All four tab routes MUST share one layout (`app/(shell)/layout.tsx`) that provides the shell
@@ -81,3 +62,24 @@ chrome, the bottom nav, and the add/edit sheet host so the FAB and list rows ope
 replacement requirement is "Tab screens".)
 (Migration: replaced by "Tab screens" above; only "Inicio" and "Perfil" remain placeholders until
 change 3.)
+
+## ADDED Requirements
+
+### Requirement: Tab screens
+
+"Movimientos" and "Presupuesto" MUST render their functional screens (the transaction ledger and
+the monthly budgets). "Inicio" and "Perfil" MUST remain empty placeholder screens in this change.
+(Previously: all four tab routes rendered empty placeholders and no sheet, CRUD, or filters existed.)
+
+#### Scenario: Placeholder tabs still render
+
+- GIVEN a valid session
+- WHEN `inicio` or `perfil` is requested
+- THEN the route MUST render successfully with placeholder content only
+
+#### Scenario: Functional tabs render their screens
+
+- GIVEN a valid session
+- WHEN `movimientos` or `presupuesto` is requested
+- THEN the route MUST render the ledger or the budgets screen respectively, with no placeholder
+  content

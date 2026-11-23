@@ -13,8 +13,8 @@ Three user-requested updates:
 ## Tasks
 
 - [x] T1 (b809a42) - Cents: store integer cents (bigint) everywhere, migration x100 with rollback, es-AR parsing/formatting, decimal keyboard.
-- [ ] T2 - Optional note: nullable `description` (max 80, trimmed, empty -> null), migration + rollback, repository, EntrySheet input, shown in LedgerRow/RecentMovements.
-- [ ] T3 - Home budget grid fits two columns at 360-430px (find root cause, keep drag-and-drop).
+- [x] T2 (93b3b15) - Optional note: nullable `description` (max 80, trimmed, empty -> null), migration + rollback, repository, EntrySheet input, shown in LedgerRow/RecentMovements.
+- [x] T3 (11d31da) - Home budget grid fits two columns at 360-430px (find root cause, keep drag-and-drop).
 
 ## Acceptance criteria
 
@@ -33,3 +33,7 @@ Single delegated writer, direct route. TDD: not configured; functional checks on
 ## Progress
 
 (commit hashes recorded as tasks finish)
+
+- Verification (final): `pnpm test` 1070 passed; `pnpm lint` clean; `pnpm exec tsc --noEmit` clean.
+- Not verified: T3 visual check on a real device or browser (headless Chrome screenshot hung); fix is based on the CSS min-content analysis plus a CSS regression test.
+- Deploy: apply migrations 0001 and 0002 to Neon BEFORE the new build serves traffic.

@@ -41,3 +41,25 @@ describe("0001_amounts_to_cents", () => {
     );
   });
 });
+
+describe("0002_transaction_description", () => {
+  const sql = read("drizzle/0002_transaction_description.sql");
+
+  it("is journaled after 0001", () => {
+    expect(journal.entries[2]?.tag).toBe("0002_transaction_description");
+  });
+
+  it("is exactly one nullable ADD COLUMN on transactions", () => {
+    expect(sql.match(/ALTER TABLE/g)).toHaveLength(1);
+    expect(sql).toContain('ALTER TABLE "transactions" ADD COLUMN "description" text');
+    expect(sql).not.toMatch(/NOT NULL|DEFAULT|DROP/i);
+  });
+
+  it("ships a non-journaled rollback that drops only description", () => {
+    const rollback = read("drizzle/0002_rollback.sql");
+    expect(rollback).toContain("ALTER TABLE transactions DROP COLUMN IF EXISTS description");
+    expect(rollback).toContain(
+      `DELETE FROM drizzle.__drizzle_migrations WHERE created_at = ${journal.entries[2]?.when}`,
+    );
+  });
+});

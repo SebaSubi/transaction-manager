@@ -34,6 +34,7 @@ function tx(id: number, overrides: Partial<DomainTransaction> = {}): DomainTrans
     amount: 1000,
     gross: 1000,
     cashbackBps: 0,
+    description: null,
     categoryId: 1,
     memberId: 10,
     date: new Date(`2026-08-${String(10 + id).padStart(2, "0")}T12:00:00Z`),

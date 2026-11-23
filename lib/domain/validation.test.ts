@@ -7,6 +7,7 @@ import {
   parseAmountCents,
   parseBudgetAmount,
   parseCashbackBps,
+  parseDescription,
   NAME_MAX_LENGTH,
   parseIdList,
   parseName,
@@ -210,6 +211,35 @@ describe("parseTransactionForm", () => {
         date: M.dateInvalid,
       },
     });
+  });
+});
+
+describe("parseDescription", () => {
+  it.each([
+    [undefined, null],
+    ["", null],
+    ["   ", null],
+    ["  Verdulería  ", "Verdulería"],
+    ["a".repeat(80), "a".repeat(80)],
+    ["😀".repeat(80), "😀".repeat(80)],
+  ])("accepts %j as %j", (raw, value) => {
+    expect(parseDescription(raw)).toEqual({ ok: true, value });
+  });
+
+  it("rejects more than 80 characters after trimming", () => {
+    expect(parseDescription(`  ${"a".repeat(81)}  `)).toEqual({
+      ok: false,
+      errors: { value: M.descriptionTooLong },
+    });
+  });
+
+  it("flows through parseTransactionForm as null or trimmed text", () => {
+    const empty = parseTransactionForm({ ...VALID, description: "  " });
+    expect(empty.ok && empty.value.description).toBeNull();
+    const text = parseTransactionForm({ ...VALID, description: " Super " });
+    expect(text.ok && text.value.description).toBe("Super");
+    const long = parseTransactionForm({ ...VALID, description: "a".repeat(81) });
+    expect(long).toEqual({ ok: false, errors: { description: M.descriptionTooLong } });
   });
 });
 

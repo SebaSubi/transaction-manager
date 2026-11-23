@@ -91,6 +91,9 @@ export const transactions = pgTable(
     // Cashback RATE in basis points (0..10000), never money. See design §1
     // for the numeric(5,2)/real/smallint-percent rejection rationale.
     cashbackBps: smallint("cashback_bps").notNull().default(0),
+    // Optional note, at most 80 characters (enforced by `parseDescription`,
+    // not the database). Nullable, no default: additive, legacy rows read null.
+    description: text("description"),
     // Buenos Aires wall-clock; see the module-level timestamp comment.
     date: timestamp("date").notNull(),
     createdAt: timestamp("created_at").notNull().default(nowInBuenosAiresSql),

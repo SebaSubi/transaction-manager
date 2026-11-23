@@ -41,7 +41,7 @@ function tx(
   categoryId: number,
   date: Date,
 ): DomainTransaction {
-  return { id, type, amount, gross: amount, cashbackBps: 0, categoryId, memberId: 10, date };
+  return { id, type, amount, gross: amount, cashbackBps: 0, description: null, categoryId, memberId: 10, date };
 }
 
 const NOW = new Date("2026-08-15T15:00:00Z");

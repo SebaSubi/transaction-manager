@@ -12,9 +12,10 @@ const base: LedgerRowView = {
   grossLabel: "$33.333",
   cashbackLabel: "7% cashback",
   dateLabel: "14 ago · 21:00",
+  note: null,
   category: { id: 1, name: "Super", icon: "shopping-cart", archived: false, color: "var(--accent-0)" },
   member: { id: 2, name: "Sofi", archived: false },
-  edit: { gross: "33333", cashback: "7", dateValue: "2026-08-14T21:00" },
+  edit: { gross: "33333", cashback: "7", dateValue: "2026-08-14T21:00", description: "" },
 };
 
 afterEach(cleanup);
@@ -28,6 +29,14 @@ describe("LedgerRow", () => {
     expect(screen.getByText("Super")).toBeDefined();
     expect(screen.getByText(/Sofi/)).toBeDefined();
     expect(screen.getByText(/14 ago · 21:00/)).toBeDefined();
+  });
+
+  it("shows the note when present and nothing when absent", () => {
+    const { rerender, container } = render(<LedgerRow row={base} onSelect={() => {}} />);
+    expect(container.querySelector(".ledger-row__note")).toBeNull();
+
+    rerender(<LedgerRow row={{ ...base, note: "Verdulería" }} onSelect={() => {}} />);
+    expect(screen.getByText("Verdulería")).toBeDefined();
   });
 
   it("omits the gross line when the view has no cashback (income or no cashback)", () => {

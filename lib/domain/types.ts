@@ -22,6 +22,8 @@ export interface DomainTransaction {
   memberId: number;
   // Wall-clock: UTC components ARE Buenos Aires local time.
   date: Date;
+  // Optional note, at most 80 characters; null when absent.
+  description: string | null;
 }
 
 // Half-open [start, endExclusive).

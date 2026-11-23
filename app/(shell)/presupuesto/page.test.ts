@@ -31,6 +31,7 @@ function expense(id: number, categoryId: number, amount: number): DomainTransact
     amount,
     gross: amount,
     cashbackBps: 0,
+    description: null,
     categoryId,
     memberId: 10,
     date: new Date("2026-08-10T12:00:00Z"),

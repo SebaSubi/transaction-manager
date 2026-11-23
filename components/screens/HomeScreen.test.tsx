@@ -52,9 +52,10 @@ const row: LedgerRowView = {
   grossLabel: null,
   cashbackLabel: null,
   dateLabel: "14 oct · 21:00",
+  note: null,
   category: { id: 1, name: "Super", icon: "tag", archived: false, color: "var(--accent-0)" },
   member: { id: 1, name: "Sofi", archived: false },
-  edit: { gross: "100", cashback: "0", dateValue: "2026-10-14T21:00" },
+  edit: { gross: "100", cashback: "0", dateValue: "2026-10-14T21:00", description: "" },
 };
 
 function setup(props: { cards: HomeCardView[]; recent: LedgerRowView[]; balance?: number }) {

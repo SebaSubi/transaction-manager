@@ -17,6 +17,7 @@ const TRANSACTION_COLUMNS = {
   categoryId: transactions.categoryId,
   memberId: transactions.memberId,
   date: transactions.date,
+  description: transactions.description,
 } as const;
 
 /**
@@ -96,6 +97,8 @@ export interface NewTransaction {
   memberId: number;
   /** Buenos Aires wall-clock. */
   date: Date;
+  /** Trimmed note or `null`; `null` clears it on update. */
+  description: string | null;
 }
 
 export async function createTransaction(

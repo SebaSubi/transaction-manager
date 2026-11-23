@@ -21,6 +21,7 @@ export const VALIDATION_MESSAGES = {
   categoryKindMismatch: "La categoría no corresponde al tipo de movimiento.",
   memberRequired: "Falta elegir quién hizo el movimiento.",
   memberUnavailable: "La persona elegida ya no está disponible.",
+  descriptionTooLong: "La nota admite como máximo 80 caracteres.",
   dateInvalid: "La fecha y hora no son válidas.",
   transactionNotFound: "El movimiento ya no existe.",
   saveFailed: "No se pudieron guardar los cambios.",

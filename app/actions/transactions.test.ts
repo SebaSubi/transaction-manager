@@ -96,6 +96,7 @@ function stored(overrides: Partial<DomainTransaction> = {}): DomainTransaction {
     amount: 3099969,
     gross: 3333300,
     cashbackBps: 700,
+    description: null,
     categoryId: 3,
     memberId: 2,
     date: new Date("2026-08-14T21:00:30Z"),
@@ -207,10 +208,31 @@ describe("createTransactionAction", () => {
       amount: 3099969,
       gross: 3333300,
       cashbackBps: 700,
+      description: null,
       categoryId: 3,
       memberId: 2,
       date: new Date("2026-08-14T21:00:00Z"),
     });
+  });
+
+  it("persists a trimmed note and null for an empty one", async () => {
+    await createTransactionAction(IDLE, form({ ...VALID_FIELDS, description: "  Verdulería " }));
+    expect(repo.createTransaction.mock.calls[0][0].description).toBe("Verdulería");
+
+    await createTransactionAction(IDLE, form({ ...VALID_FIELDS, description: "   " }));
+    expect(repo.createTransaction.mock.calls[1][0].description).toBeNull();
+  });
+
+  it("rejects a note over 80 characters without a write", async () => {
+    const state = await createTransactionAction(
+      IDLE,
+      form({ ...VALID_FIELDS, description: "a".repeat(81) }),
+    );
+    expect(state).toMatchObject({
+      status: "error",
+      fieldErrors: { description: M.descriptionTooLong },
+    });
+    expect(repo.createTransaction).not.toHaveBeenCalled();
   });
 
   it("ignores a client-supplied amount", async () => {
@@ -231,6 +253,7 @@ describe("createTransactionAction", () => {
       type: "income",
       amount: 3333300,
       cashbackBps: 0,
+      description: null,
     });
   });
 
@@ -340,6 +363,7 @@ describe("updateTransactionAction", () => {
       amount: 3099969,
       gross: 3333300,
       cashbackBps: 700,
+      description: null,
     });
     expect(state).toMatchObject({ status: "saved", memberId: 2 });
     expect(jar.set.map((c) => [c.name, c.value])).toEqual([[LAST_MEMBER_COOKIE, "2"]]);

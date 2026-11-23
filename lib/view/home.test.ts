@@ -19,6 +19,7 @@ const tx = (categoryId: number, amount: number): DomainTransaction => ({
   amount,
   gross: amount,
   cashbackBps: 0,
+  description: null,
   categoryId,
   memberId: 1,
   date: new Date(Date.UTC(2026, 9, 5)),

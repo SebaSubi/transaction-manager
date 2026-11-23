@@ -378,6 +378,15 @@ a {
   font-size: 12px;
 }
 
+.ledger-row__note {
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-style: italic;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .ledger-row__amounts {
   display: flex;
   flex-direction: column;

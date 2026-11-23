@@ -15,6 +15,13 @@
       "when": 1795465904750,
       "tag": "0001_amounts_to_cents",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795466097898,
+      "tag": "0002_transaction_description",
+      "breakpoints": true
     }
   ]
 }

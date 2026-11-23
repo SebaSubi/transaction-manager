@@ -25,6 +25,8 @@ export interface LedgerRowView {
   /** '7% cashback', only for an expense with cashback. */
   cashbackLabel: string | null;
   dateLabel: string;
+  /** The optional note, or `null`. */
+  note: string | null;
   category: {
     id: number;
     name: string;
@@ -35,7 +37,7 @@ export interface LedgerRowView {
   };
   member: { id: number; name: string; archived: boolean };
   /** Seed strings for the edit form inputs. */
-  edit: { gross: string; cashback: string; dateValue: string };
+  edit: { gross: string; cashback: string; dateValue: string; description: string };
 }
 
 /**
@@ -57,6 +59,7 @@ export function toLedgerRowView(
     grossLabel: hasCashback ? formatArs(tx.gross) : null,
     cashbackLabel: hasCashback ? `${formatPercent(tx.cashbackBps)}% cashback` : null,
     dateLabel: formatShortDate(tx.date),
+    note: tx.description,
     category: {
       id: category.id,
       name: category.name,
@@ -69,6 +72,7 @@ export function toLedgerRowView(
       gross: formatCentsInput(tx.gross),
       cashback: formatPercent(tx.cashbackBps),
       dateValue: toDateTimeLocalValue(tx.date),
+      description: tx.description ?? "",
     },
   };
 }

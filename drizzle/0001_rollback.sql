@@ -10,7 +10,7 @@ UPDATE transactions SET amount = ROUND(amount / 100.0), gross = ROUND(gross / 10
 ALTER TABLE budgets ALTER COLUMN amount SET DATA TYPE integer;
 ALTER TABLE transactions ALTER COLUMN amount SET DATA TYPE integer;
 ALTER TABLE transactions ALTER COLUMN gross SET DATA TYPE integer;
--- Lets `pnpm db:migrate` re-apply 0001 later. The value is the `when` of the
+-- Lets the migrator re-apply 0001 later. The value is the `when` of the
 -- 0001 entry in drizzle/meta/_journal.json (drizzle-orm stores it as created_at
 -- in drizzle.__drizzle_migrations).
 DELETE FROM drizzle.__drizzle_migrations WHERE created_at = 1795465904750;

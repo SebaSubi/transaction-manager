@@ -9,6 +9,7 @@ export type TransactionField =
   | "categoryId"
   | "memberId"
   | "date"
+  | "description"
   | "id";
 export type FieldErrors<F extends string> = Partial<Record<F, string>>;
 export type ParseResult<T, F extends string> =
@@ -23,6 +24,7 @@ export interface RawTransactionForm {
   categoryId?: string;
   memberId?: string;
   date?: string;
+  description?: string;
 }
 
 export interface ParsedTransactionInput {
@@ -33,12 +35,26 @@ export interface ParsedTransactionInput {
   memberId: number;
   /** Wall-clock. */
   date: Date;
+  /** Trimmed note, at most 80 characters; `null` when empty. */
+  description: string | null;
 }
 
 // Largest accepted amount: $999.999.999,99 expressed in integer cents.
 const MAX_CENTS = 99_999_999_999;
 const MIN_YEAR = 2000;
 const MAX_YEAR = 2099;
+
+export const DESCRIPTION_MAX_LENGTH = 80;
+
+/** An optional note: trimmed, empty becomes `null`, over-long (by code point) fails. */
+export function parseDescription(raw: string | undefined): ParseResult<string | null, "value"> {
+  const text = (raw ?? "").trim();
+  if (text === "") return { ok: true, value: null };
+  if ([...text].length > DESCRIPTION_MAX_LENGTH) {
+    return { ok: false, errors: { value: M.descriptionTooLong } };
+  }
+  return { ok: true, value: text };
+}
 
 /**
  * Parses a positive peso amount into integer CENTS by string arithmetic (never
@@ -187,20 +203,32 @@ export function parseTransactionForm(
   const date = parseDate(raw.date);
   if (date === null) errors.date = M.dateInvalid;
 
+  const description = parseDescription(raw.description);
+  if (!description.ok) errors.description = description.errors.value;
+
   if (
     Object.keys(errors).length > 0 ||
     type === null ||
     !gross.ok ||
     categoryId === null ||
     memberId === null ||
-    date === null
+    date === null ||
+    !description.ok
   ) {
     return { ok: false, errors };
   }
 
   return {
     ok: true,
-    value: { type, gross: gross.value, cashbackBps, categoryId, memberId, date },
+    value: {
+      type,
+      gross: gross.value,
+      cashbackBps,
+      categoryId,
+      memberId,
+      date,
+      description: description.value,
+    },
   };
 }
 

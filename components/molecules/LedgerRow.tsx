@@ -36,6 +36,7 @@ export function LedgerRow({
           {" · "}
           {row.dateLabel}
         </span>
+        {row.note !== null ? <span className="ledger-row__note">{row.note}</span> : null}
       </span>
       <span className="ledger-row__amounts">
         <span className={`ledger-row__amount ledger-row__amount--${row.type}`}>

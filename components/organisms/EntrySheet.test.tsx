@@ -40,9 +40,10 @@ const row: LedgerRowView = {
   grossLabel: "$33.333",
   cashbackLabel: "7% cashback",
   dateLabel: "14 ago · 21:00",
+  note: null,
   category: { id: 1, name: "Super", icon: "shopping-cart", archived: false, color: "var(--accent-0)" },
   member: { id: 11, name: "Mati", archived: false },
-  edit: { gross: "33.333", cashback: "7", dateValue: "2026-08-14T21:00" },
+  edit: { gross: "33.333", cashback: "7", dateValue: "2026-08-14T21:00", description: "" },
 };
 
 const archivedRow: LedgerRowView = {
@@ -192,6 +193,26 @@ describe("EntrySheet (create)", () => {
     expect(screen.getByRole("dialog")).toBeDefined();
   });
 
+  it("submits the optional note as typed", async () => {
+    actions.create.mockResolvedValue({
+      status: "error",
+      fieldErrors: {},
+      formError: null,
+    });
+    setup();
+    const input = screen.getByLabelText("Nota") as HTMLInputElement;
+    expect(input.placeholder).toBe("Detalle (opcional)");
+    expect(input.maxLength).toBe(80);
+    fireEvent.change(screen.getByLabelText("Monto"), { target: { value: "500" } });
+    fireEvent.change(input, { target: { value: "Verdulería" } });
+
+    await act(async () => {
+      fireEvent.submit(document.querySelector("form")!);
+    });
+
+    expect((actions.create.mock.calls[0][1] as FormData).get("description")).toBe("Verdulería");
+  });
+
   it("closes the sheet after a successful create", async () => {
     actions.create.mockResolvedValue({ status: "saved", row, memberId: 10 });
     setup();
@@ -229,6 +250,11 @@ describe("EntrySheet (edit)", () => {
     expect(screen.getByRole("radio", { name: "Mati" }).getAttribute("aria-checked")).toBe("true");
     expect(hidden("id")).toBe("5");
     expect(screen.getByRole("button", { name: "Guardar cambios" })).toBeDefined();
+  });
+
+  it("pre-fills the note when editing", () => {
+    setup({ edit: { ...row, edit: { ...row.edit, description: "Verdulería" } } });
+    expect((screen.getByLabelText("Nota") as HTMLInputElement).value).toBe("Verdulería");
   });
 
   it("shows an archived category and member marked (en archivo) as the row's own stored value", () => {

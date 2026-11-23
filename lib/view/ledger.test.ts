@@ -14,6 +14,7 @@ function tx(overrides: Partial<DomainTransaction> = {}): DomainTransaction {
     amount: 3100000,
     gross: 3333300,
     cashbackBps: 700,
+    description: null,
     categoryId: 3,
     memberId: 2,
     date: new Date("2026-08-14T21:00:00Z"),
@@ -112,7 +113,16 @@ describe("toLedgerRowView", () => {
       gross: "33.333",
       cashback: "7,5",
       dateValue: toDateTimeLocalValue(new Date("2026-08-14T21:00:00Z")),
+      description: "",
     });
+  });
+
+  it("exposes the note on the row and seeds the edit input with it", () => {
+    const view = toLedgerRowView(tx({ description: "Verdulería" }), category(), member());
+
+    expect(view.note).toBe("Verdulería");
+    expect(view.edit.description).toBe("Verdulería");
+    expect(toLedgerRowView(tx(), category(), member()).note).toBeNull();
     expect(view.edit.dateValue).toBe("2026-08-14T21:00");
   });
 

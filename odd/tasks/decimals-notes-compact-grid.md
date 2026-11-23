@@ -12,7 +12,7 @@ Three user-requested updates:
 
 ## Tasks
 
-- [ ] T1 - Cents: store integer cents (bigint) everywhere, migration x100 with rollback, es-AR parsing/formatting, decimal keyboard.
+- [x] T1 (b809a42) - Cents: store integer cents (bigint) everywhere, migration x100 with rollback, es-AR parsing/formatting, decimal keyboard.
 - [ ] T2 - Optional note: nullable `description` (max 80, trimmed, empty -> null), migration + rollback, repository, EntrySheet input, shown in LedgerRow/RecentMovements.
 - [ ] T3 - Home budget grid fits two columns at 360-430px (find root cause, keep drag-and-drop).
 

@@ -29,7 +29,11 @@ import { categoryColor } from "@/lib/domain/categories";
 import { formatArs } from "@/lib/domain/format";
 import { computeNetAmount } from "@/lib/domain/money";
 import type { TransactionType } from "@/lib/domain/types";
-import { parseCashbackBps, parseWholePesos } from "@/lib/domain/validation";
+import {
+  DESCRIPTION_MAX_LENGTH,
+  parseAmountCents,
+  parseCashbackBps,
+} from "@/lib/domain/validation";
 import {
   INITIAL_TRANSACTION_FORM_STATE,
   type TransactionFormState,
@@ -49,7 +53,7 @@ export function EntrySheet() {
 /** Display-only preview: the same pure function the server uses for the net. */
 function previewFor(type: TransactionType, grossRaw: string, cashbackRaw: string): string | null {
   if (type !== "expense") return null;
-  const gross = parseWholePesos(grossRaw);
+  const gross = parseAmountCents(grossRaw);
   const cashback = parseCashbackBps(cashbackRaw);
   if (!gross.ok || !cashback.ok || cashback.value === 0) return null;
 
@@ -86,6 +90,7 @@ function EntryForm() {
     editing?.member.id ?? defaultMemberId,
   );
   const [date, setDate] = useState(editing?.edit.dateValue ?? initialDateValue);
+  const [description, setDescription] = useState(editing?.edit.description ?? "");
   const [confirming, setConfirming] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deleting, startDelete] = useTransition();
@@ -267,6 +272,24 @@ function EntryForm() {
               onChange={(event) => setDate(event.target.value)}
             />
             <FieldError message={errors.date} />
+          </div>
+
+          <div className="field">
+            <label className="field__label" htmlFor="entry-description">
+              {SHEET_COPY.descriptionLabel}
+            </label>
+            <input
+              id="entry-description"
+              name="description"
+              type="text"
+              className="input"
+              autoComplete="off"
+              maxLength={DESCRIPTION_MAX_LENGTH}
+              placeholder={SHEET_COPY.descriptionPlaceholder}
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
+            />
+            <FieldError message={errors.description} />
           </div>
 
           <FieldError message={formError} />

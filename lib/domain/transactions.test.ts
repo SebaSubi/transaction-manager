@@ -14,6 +14,7 @@ function tx(overrides: Partial<DomainTransaction> & { id: number }): DomainTrans
     amount: 100,
     gross: 100,
     cashbackBps: 0,
+    description: null,
     categoryId: 1,
     memberId: 1,
     date: new Date(Date.UTC(2026, 7, 10)),

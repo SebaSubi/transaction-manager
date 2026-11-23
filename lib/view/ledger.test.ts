@@ -11,9 +11,10 @@ function tx(overrides: Partial<DomainTransaction> = {}): DomainTransaction {
   return {
     id: 7,
     type: "expense",
-    amount: 31000,
-    gross: 33333,
+    amount: 3100000,
+    gross: 3333300,
     cashbackBps: 700,
+    description: null,
     categoryId: 3,
     memberId: 2,
     date: new Date("2026-08-14T21:00:00Z"),
@@ -56,7 +57,7 @@ describe("toLedgerRowView", () => {
 
   it("omits gross and cashback labels for an expense without cashback", () => {
     const view = toLedgerRowView(
-      tx({ cashbackBps: 0, gross: 31000 }),
+      tx({ cashbackBps: 0, gross: 3100000 }),
       category(),
       member(),
     );
@@ -67,7 +68,7 @@ describe("toLedgerRowView", () => {
 
   it("never shows gross or cashback for an income", () => {
     const view = toLedgerRowView(
-      tx({ type: "income", amount: 50000, gross: 50000, cashbackBps: 0 }),
+      tx({ type: "income", amount: 5000000, gross: 5000000, cashbackBps: 0 }),
       category({ kind: "income" }),
       member(),
     );
@@ -109,10 +110,19 @@ describe("toLedgerRowView", () => {
     );
 
     expect(view.edit).toEqual({
-      gross: "33333",
+      gross: "33.333",
       cashback: "7,5",
       dateValue: toDateTimeLocalValue(new Date("2026-08-14T21:00:00Z")),
+      description: "",
     });
+  });
+
+  it("exposes the note on the row and seeds the edit input with it", () => {
+    const view = toLedgerRowView(tx({ description: "Verdulería" }), category(), member());
+
+    expect(view.note).toBe("Verdulería");
+    expect(view.edit.description).toBe("Verdulería");
+    expect(toLedgerRowView(tx(), category(), member()).note).toBeNull();
     expect(view.edit.dateValue).toBe("2026-08-14T21:00");
   });
 

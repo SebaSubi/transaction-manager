@@ -10,7 +10,7 @@
  */
 export const VALIDATION_MESSAGES = {
   grossRequired: "El monto es obligatorio.",
-  grossNotWhole: "El monto debe ser un número entero, sin decimales.",
+  grossInvalid: "El monto no es válido. Usá números, con hasta 2 decimales (por ejemplo 1.500,50).",
   grossNotPositive: "El monto debe ser mayor que cero.",
   grossTooLarge: "El monto es demasiado grande.",
   cashbackInvalid: "El cashback debe ser un porcentaje entre 0 y 100, con hasta 2 decimales.",
@@ -21,11 +21,12 @@ export const VALIDATION_MESSAGES = {
   categoryKindMismatch: "La categoría no corresponde al tipo de movimiento.",
   memberRequired: "Falta elegir quién hizo el movimiento.",
   memberUnavailable: "La persona elegida ya no está disponible.",
+  descriptionTooLong: "La nota admite como máximo 80 caracteres.",
   dateInvalid: "La fecha y hora no son válidas.",
   transactionNotFound: "El movimiento ya no existe.",
   saveFailed: "No se pudieron guardar los cambios.",
   deleteFailed: "No se pudo eliminar el movimiento.",
-  budgetAmountInvalid: "El monto debe ser un número entero mayor que cero.",
+  budgetAmountInvalid: "El monto debe ser un número mayor que cero, con hasta 2 decimales.",
   budgetCategoryNotExpense: "Solo se pueden presupuestar categorías de gastos.",
   budgetSaveFailed: "No se pudo guardar el presupuesto.",
   budgetRemoveFailed: "No se pudo quitar la categoría.",

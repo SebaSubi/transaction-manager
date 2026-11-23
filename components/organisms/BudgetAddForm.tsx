@@ -84,7 +84,7 @@ function AddFields({
       <input
         name="amount"
         type="text"
-        inputMode="numeric"
+        inputMode="decimal"
         autoComplete="off"
         className="input"
         aria-label={BUDGET_COPY.addAmount}

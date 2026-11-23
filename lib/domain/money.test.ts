@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { bpsToPercent, computeNetAmount, percentToBps } from "@/lib/domain/money";
+import { bpsToPercent, computeNetAmount, percentToBps, pesosToCents } from "@/lib/domain/money";
 
 describe("computeNetAmount", () => {
   it("reduces an expense below gross by the cashback rate, rounding once", () => {
@@ -77,5 +77,19 @@ describe("bpsToPercent", () => {
   it("converts basis points back to percent", () => {
     expect(bpsToPercent(10000)).toBe(100);
     expect(bpsToPercent(0)).toBe(0);
+  });
+});
+
+describe("cents", () => {
+  it("rounds the net to the nearest cent", () => {
+    // 33333,33 pesos = 3333333 cents; * 0.93 = 3099999.69 -> 3100000
+    expect(
+      computeNetAmount({ type: "expense", gross: 3_333_333, cashbackBps: percentToBps(7) }),
+    ).toBe(3_100_000);
+  });
+
+  it("converts whole pesos to cents", () => {
+    expect(pesosToCents(45000)).toBe(4_500_000);
+    expect(pesosToCents(0)).toBe(0);
   });
 });

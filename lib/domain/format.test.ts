@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   formatArs,
+  formatCentsInput,
   formatPercent,
   formatPesoInput,
   normalizePesoInput,
@@ -12,22 +13,28 @@ import {
 describe("formatArs", () => {
   it.each([
     [0, "$0"],
-    [999, "$999"],
-    [1000, "$1.000"],
-    [1234567, "$1.234.567"],
-    [-5000, "-$5.000"],
-  ])("%i -> %s", (amount, expected) => {
+    [99900, "$999"],
+    [100000, "$1.000"],
+    [123456700, "$1.234.567"],
+    [-500000, "-$5.000"],
+    [1989800, "$19.898"],
+    [1989850, "$19.898,50"],
+    [1989805, "$19.898,05"],
+    [50, "$0,50"],
+    [5, "$0,05"],
+    [-1050, "-$10,50"],
+  ])("%i cents -> %s", (amount, expected) => {
     expect(formatArs(amount)).toBe(expected);
   });
 });
 
 describe("formatSignedArs", () => {
   it("prefixes an expense with a minus", () => {
-    expect(formatSignedArs("expense", 31000)).toBe("-$31.000");
+    expect(formatSignedArs("expense", 3100000)).toBe("-$31.000");
   });
 
   it("prefixes an income with a plus", () => {
-    expect(formatSignedArs("income", 50000)).toBe("+$50.000");
+    expect(formatSignedArs("income", 5000050)).toBe("+$50.000,50");
   });
 });
 
@@ -72,16 +79,33 @@ describe("normalizePesoInput", () => {
     ["12000000", "12.000.000"],
     ["12.000.0000", "120.000.000"],
     ["1.500", "1.500"],
-    ["1.50", "150"],
+    ["1.50", "1,50"],
+    ["1500.5", "1.500,5"],
+    ["1500.", "1.500,"],
+    ["1.500.", "1.500"],
+    ["1500,50", "1.500,50"],
+    ["1.500,5", "1.500,5"],
+    [",5", "0,5"],
+    ["0,", "0,"],
     ["", ""],
   ])("regroups %j -> %j", (raw, expected) => {
     expect(normalizePesoInput(raw)).toBe(expected);
   });
 
-  it.each(["1500,50", "33,5", "abc", "12abc", "-5", "1 500", "."])(
+  it.each(["abc", "12abc", "-5", "1 500", ".", "1,234", "1,5,5", "1,5.5"])(
     "leaves %j unchanged so server validation shows",
     (raw) => {
       expect(normalizePesoInput(raw)).toBe(raw);
     },
   );
+});
+
+describe("formatCentsInput", () => {
+  it.each([
+    [150000, "1.500"],
+    [150050, "1.500,50"],
+    [5, "0,05"],
+  ])("%i cents -> %s", (cents, expected) => {
+    expect(formatCentsInput(cents)).toBe(expected);
+  });
 });

@@ -123,6 +123,7 @@ describe("buildLedgerFilterOptions", () => {
         amount: 100,
         gross: 100,
         cashbackBps: 0,
+        description: null,
         categoryId: 1,
         memberId: 1,
         date: new Date("2026-08-10T10:00:00Z"),

@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  bigint,
   char,
   check,
   index,
@@ -82,13 +83,17 @@ export const transactions = pgTable(
       .notNull()
       .references(() => categories.id, { onDelete: "restrict" }),
     type: transactionType("type").notNull(),
-    // Net, whole ARS pesos.
-    amount: integer("amount").notNull(),
-    // Original (pre-cashback), whole ARS pesos.
-    gross: integer("gross").notNull(),
+    // Net, integer ARS CENTS (minor units). bigint: 999.999.999,99 pesos
+    // overflows int4. `mode: "number"` is exact up to 2^53.
+    amount: bigint("amount", { mode: "number" }).notNull(),
+    // Original (pre-cashback), integer ARS cents.
+    gross: bigint("gross", { mode: "number" }).notNull(),
     // Cashback RATE in basis points (0..10000), never money. See design §1
     // for the numeric(5,2)/real/smallint-percent rejection rationale.
     cashbackBps: smallint("cashback_bps").notNull().default(0),
+    // Optional note, at most 80 characters (enforced by `parseDescription`,
+    // not the database). Nullable, no default: additive, legacy rows read null.
+    description: text("description"),
     // Buenos Aires wall-clock; see the module-level timestamp comment.
     date: timestamp("date").notNull(),
     createdAt: timestamp("created_at").notNull().default(nowInBuenosAiresSql),
@@ -128,7 +133,8 @@ export const budgets = pgTable(
     categoryId: integer("category_id")
       .notNull()
       .references(() => categories.id, { onDelete: "restrict" }),
-    amount: integer("amount").notNull(),
+    // Integer ARS cents (minor units).
+    amount: bigint("amount", { mode: "number" }).notNull(),
     createdAt: timestamp("created_at").notNull().default(nowInBuenosAiresSql),
     updatedAt: timestamp("updated_at").notNull().default(nowInBuenosAiresSql),
   },

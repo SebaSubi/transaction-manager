@@ -18,6 +18,8 @@ export const SHEET_COPY = {
   categoryLabel: "Categoría",
   memberLabel: "Quién",
   dateLabel: "Fecha y hora",
+  descriptionLabel: "Nota",
+  descriptionPlaceholder: "Detalle (opcional)",
   archivedMarker: "(en archivo)",
   submitCreate: "Registrar",
   submitEdit: "Guardar cambios",

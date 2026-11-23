@@ -40,9 +40,10 @@ function makeRow(id: number): LedgerRowView {
     grossLabel: null,
     cashbackLabel: null,
     dateLabel: "14 ago · 21:00",
+    note: null,
     category: { id, name: `Cat ${id}`, icon: "tag", archived: false, color: "var(--accent-0)" },
     member: { id: 1, name: "Sofi", archived: false },
-    edit: { gross: "100", cashback: "0", dateValue: "2026-08-14T21:00" },
+    edit: { gross: "100", cashback: "0", dateValue: "2026-08-14T21:00", description: "" },
   };
 }
 

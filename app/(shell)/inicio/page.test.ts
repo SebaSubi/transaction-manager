@@ -41,7 +41,7 @@ function tx(
   categoryId: number,
   date: Date,
 ): DomainTransaction {
-  return { id, type, amount, gross: amount, cashbackBps: 0, categoryId, memberId: 10, date };
+  return { id, type, amount, gross: amount, cashbackBps: 0, description: null, categoryId, memberId: 10, date };
 }
 
 const NOW = new Date("2026-08-15T15:00:00Z");
@@ -62,15 +62,15 @@ beforeEach(() => {
   for (const mock of Object.values(repos)) mock.mockReset();
 
   const monthTxs = [
-    tx(3, "income", 5000, 9, new Date("2026-08-10T12:00:00Z")),
-    tx(2, "expense", 800, 1, new Date("2026-08-09T12:00:00Z")),
-    tx(1, "expense", 200, 2, new Date("2026-08-02T12:00:00Z")),
+    tx(3, "income", 500000, 9, new Date("2026-08-10T12:00:00Z")),
+    tx(2, "expense", 80000, 1, new Date("2026-08-09T12:00:00Z")),
+    tx(1, "expense", 20000, 2, new Date("2026-08-02T12:00:00Z")),
   ];
   repos.listTransactionsInRange.mockResolvedValue(monthTxs);
   repos.getBudgetsForMonth.mockResolvedValue([
-    { categoryId: 1, amount: 1000 },
-    { categoryId: 2, amount: 500 },
-    { categoryId: 5, amount: 300 },
+    { categoryId: 1, amount: 100000 },
+    { categoryId: 2, amount: 50000 },
+    { categoryId: 5, amount: 30000 },
   ]);
   repos.listActiveCategoriesByKind.mockResolvedValue([
     { id: 1, name: "Super", kind: "expense", icon: "shopping-cart", colorIndex: 0 },
@@ -99,7 +99,7 @@ describe("inicio page", () => {
     const props = await render();
 
     expect(props.monthName).toBe("Agosto");
-    expect(props.balance).toBe(4000);
+    expect(props.balance).toBe(400000);
   });
 
   it("builds cards for budgeted active expense categories in the stored order", async () => {

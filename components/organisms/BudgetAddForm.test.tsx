@@ -33,7 +33,7 @@ describe("BudgetAddForm", () => {
     expect(screen.queryByRole("option", { name: "Gas" })).toBeNull();
   });
 
-  it("groups digits in the amount as the user types and leaves commas alone", () => {
+  it("groups digits in the amount as the user types and keeps the decimal part", () => {
     render(<BudgetAddForm month="2026-08" categories={categories} budgetedIds={[1]} />);
     fireEvent.click(screen.getByRole("button", { name: "+ Agregar categoría" }));
     const amount = screen.getByLabelText("Monto") as HTMLInputElement;
@@ -42,7 +42,7 @@ describe("BudgetAddForm", () => {
     expect(amount.value).toBe("12.000.000");
 
     fireEvent.change(amount, { target: { value: "1500,50" } });
-    expect(amount.value).toBe("1500,50");
+    expect(amount.value).toBe("1.500,50");
   });
 
   it("is hidden when every category already has a budget", () => {
@@ -74,7 +74,7 @@ describe("BudgetAddForm", () => {
   it("keeps the form open and shows server errors", async () => {
     actions.upsert.mockResolvedValue({
       status: "error",
-      fieldErrors: { amount: "El monto debe ser un número entero mayor que cero." },
+      fieldErrors: { amount: "El monto debe ser un número mayor que cero, con hasta 2 decimales." },
       formError: null,
     });
     render(<BudgetAddForm month="2026-08" categories={categories} budgetedIds={[]} />);
@@ -85,7 +85,7 @@ describe("BudgetAddForm", () => {
     });
 
     expect(screen.getByRole("alert").textContent).toBe(
-      "El monto debe ser un número entero mayor que cero.",
+      "El monto debe ser un número mayor que cero, con hasta 2 decimales.",
     );
     expect(screen.getByLabelText("Monto")).toBeDefined();
   });

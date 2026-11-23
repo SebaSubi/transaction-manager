@@ -93,9 +93,10 @@ function stored(overrides: Partial<DomainTransaction> = {}): DomainTransaction {
   return {
     id: 10,
     type: "expense",
-    amount: 31000,
-    gross: 33333,
+    amount: 3099969,
+    gross: 3333300,
     cashbackBps: 700,
+    description: null,
     categoryId: 3,
     memberId: 2,
     date: new Date("2026-08-14T21:00:30Z"),
@@ -186,12 +187,12 @@ describe("createTransactionAction", () => {
   it("returns field errors for invalid input, with no write and no cookie", async () => {
     const state = await createTransactionAction(
       IDLE,
-      form({ ...VALID_FIELDS, gross: "12.5", date: "" }),
+      form({ ...VALID_FIELDS, gross: "12,555", date: "" }),
     );
 
     expect(state).toMatchObject({
       status: "error",
-      fieldErrors: { gross: M.grossNotWhole, date: M.dateInvalid },
+      fieldErrors: { gross: M.grossInvalid, date: M.dateInvalid },
     });
     expect(repo.createTransaction).not.toHaveBeenCalled();
     expect(jar.set).toHaveLength(0);
@@ -204,19 +205,40 @@ describe("createTransactionAction", () => {
     expect(repo.createTransaction).toHaveBeenCalledTimes(1);
     expect(repo.createTransaction).toHaveBeenCalledWith({
       type: "expense",
-      amount: 31000,
-      gross: 33333,
+      amount: 3099969,
+      gross: 3333300,
       cashbackBps: 700,
+      description: null,
       categoryId: 3,
       memberId: 2,
       date: new Date("2026-08-14T21:00:00Z"),
     });
   });
 
+  it("persists a trimmed note and null for an empty one", async () => {
+    await createTransactionAction(IDLE, form({ ...VALID_FIELDS, description: "  Verdulería " }));
+    expect(repo.createTransaction.mock.calls[0][0].description).toBe("Verdulería");
+
+    await createTransactionAction(IDLE, form({ ...VALID_FIELDS, description: "   " }));
+    expect(repo.createTransaction.mock.calls[1][0].description).toBeNull();
+  });
+
+  it("rejects a note over 80 characters without a write", async () => {
+    const state = await createTransactionAction(
+      IDLE,
+      form({ ...VALID_FIELDS, description: "a".repeat(81) }),
+    );
+    expect(state).toMatchObject({
+      status: "error",
+      fieldErrors: { description: M.descriptionTooLong },
+    });
+    expect(repo.createTransaction).not.toHaveBeenCalled();
+  });
+
   it("ignores a client-supplied amount", async () => {
     await createTransactionAction(IDLE, form({ ...VALID_FIELDS, amount: "1" }));
 
-    expect(repo.createTransaction.mock.calls[0][0].amount).toBe(31000);
+    expect(repo.createTransaction.mock.calls[0][0].amount).toBe(3099969);
   });
 
   it("forces cashback to zero for an income", async () => {
@@ -229,8 +251,9 @@ describe("createTransactionAction", () => {
 
     expect(repo.createTransaction.mock.calls[0][0]).toMatchObject({
       type: "income",
-      amount: 33333,
+      amount: 3333300,
       cashbackBps: 0,
+      description: null,
     });
   });
 
@@ -337,9 +360,10 @@ describe("updateTransactionAction", () => {
     expect(repo.updateTransaction).toHaveBeenCalledTimes(1);
     expect(repo.updateTransaction.mock.calls[0][0]).toBe(10);
     expect(repo.updateTransaction.mock.calls[0][1]).toMatchObject({
-      amount: 31000,
-      gross: 33333,
+      amount: 3099969,
+      gross: 3333300,
       cashbackBps: 700,
+      description: null,
     });
     expect(state).toMatchObject({ status: "saved", memberId: 2 });
     expect(jar.set.map((c) => [c.name, c.value])).toEqual([[LAST_MEMBER_COOKIE, "2"]]);

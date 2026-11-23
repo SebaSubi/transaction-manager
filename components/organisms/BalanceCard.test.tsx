@@ -8,7 +8,7 @@ afterEach(cleanup);
 
 describe("BalanceCard", () => {
   it("shows the month label and the formatted balance", () => {
-    render(<BalanceCard monthName="Octubre" balance={125000} />);
+    render(<BalanceCard monthName="Octubre" balance={12500000} />);
 
     expect(screen.getByText("Balance de octubre")).toBeDefined();
     expect(screen.getByText("$125.000")).toBeDefined();

@@ -20,9 +20,10 @@ const row = {
   grossLabel: null,
   cashbackLabel: null,
   dateLabel: "1 oct",
+  note: null,
   category: { id: 1, name: "Super", icon: "tag", archived: false, color: "var(--accent-0)" },
   member: { id: 1, name: "Ana", archived: false },
-  edit: { gross: "100", cashback: "0", dateValue: "2026-10-01T10:00" },
+  edit: { gross: "100", cashback: "0", dateValue: "2026-10-01T10:00", description: "" },
 } satisfies LedgerRowView;
 
 describe("RecentMovements", () => {

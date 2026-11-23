@@ -15,9 +15,10 @@ function row(id: number, amountLabel = "-$100"): LedgerRowView {
     grossLabel: null,
     cashbackLabel: null,
     dateLabel: "1 ago · 10:00",
+    note: null,
     category: { id: 1, name: "Cat", icon: "tag", archived: false, color: "var(--accent-1)" },
     member: { id: 1, name: "Ana", archived: false },
-    edit: { gross: "100", cashback: "0", dateValue: "2026-08-01T10:00" },
+    edit: { gross: "100", cashback: "0", dateValue: "2026-08-01T10:00", description: "" },
   };
 }
 

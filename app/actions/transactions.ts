@@ -58,6 +58,7 @@ function readForm(form: FormData): RawTransactionForm {
     categoryId: field(form, "categoryId"),
     memberId: field(form, "memberId"),
     date: field(form, "date"),
+    description: field(form, "description"),
   };
 }
 
@@ -141,6 +142,7 @@ async function saveTransaction(
     categoryId: input.categoryId,
     memberId: input.memberId,
     date,
+    description: input.description,
   };
 
   let persisted: DomainTransaction | null;

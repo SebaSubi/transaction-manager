@@ -17,6 +17,7 @@ const TRANSACTION_COLUMNS = {
   categoryId: transactions.categoryId,
   memberId: transactions.memberId,
   date: transactions.date,
+  description: transactions.description,
 } as const;
 
 /**
@@ -87,7 +88,7 @@ export async function listAllTransactions(
 
 export interface NewTransaction {
   type: TransactionType;
-  /** Net, whole ARS pesos — already produced by `computeNetAmount`. */
+  /** Net, integer ARS cents — already produced by `computeNetAmount`. */
   amount: number;
   gross: number;
   /** 0..10000; the DB CHECK forces 0 when `type` is 'income'. */
@@ -96,6 +97,8 @@ export interface NewTransaction {
   memberId: number;
   /** Buenos Aires wall-clock. */
   date: Date;
+  /** Trimmed note or `null`; `null` clears it on update. */
+  description: string | null;
 }
 
 export async function createTransaction(

@@ -12,9 +12,9 @@ export type EffectiveTheme = "dark" | "light";
 export interface DomainTransaction {
   id: number;
   type: TransactionType;
-  // Net, whole ARS pesos.
+  // Net, integer ARS cents.
   amount: number;
-  // Whole ARS pesos.
+  // Integer ARS cents.
   gross: number;
   // 0..10000; always 0 when type === 'income'.
   cashbackBps: number;
@@ -22,6 +22,8 @@ export interface DomainTransaction {
   memberId: number;
   // Wall-clock: UTC components ARE Buenos Aires local time.
   date: Date;
+  // Optional note, at most 80 characters; null when absent.
+  description: string | null;
 }
 
 // Half-open [start, endExclusive).

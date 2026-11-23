@@ -28,9 +28,26 @@ describe("AmountField", () => {
     expect(input().value).toBe("33.333");
   });
 
-  it("leaves a value with a comma as typed", () => {
+  it("keeps a comma decimal part and groups the integer part", () => {
     render(<Harness />);
     fireEvent.change(input(), { target: { value: "1500,50" } });
-    expect(input().value).toBe("1500,50");
+    expect(input().value).toBe("1.500,50");
+  });
+
+  it("reads an unambiguous dot as the decimal separator", () => {
+    render(<Harness />);
+    fireEvent.change(input(), { target: { value: "1500.5" } });
+    expect(input().value).toBe("1.500,5");
+  });
+
+  it("leaves a third decimal as typed so validation shows", () => {
+    render(<Harness />);
+    fireEvent.change(input(), { target: { value: "1,505" } });
+    expect(input().value).toBe("1,505");
+  });
+
+  it("asks iOS for the decimal keyboard", () => {
+    render(<Harness />);
+    expect(input().inputMode).toBe("decimal");
   });
 });

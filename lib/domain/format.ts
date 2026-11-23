@@ -16,20 +16,61 @@ export function formatPesoInput(digits: string): string {
 }
 
 /**
- * Normalizes a peso input while typing: keeps digits and re-groups them with
- * dots. Anything else (a comma, letters, a minus, spaces) is returned unchanged
- * so server-side validation shows its message; a comma is never dropped.
+ * Normalizes an amount input while typing (es-AR): digits are re-grouped with
+ * '.' thousands separators and an optional ',' decimal part of at most 2
+ * digits is kept. A '.' is read as a decimal point only when that is
+ * unambiguous: a trailing '.' ('1500.') or 1-2 digits after the only '.' with
+ * no comma ('1500.5', '12.50'). '1.500' stays thousands. Anything else
+ * (letters, a minus, spaces, a second comma, 3+ decimals) is returned unchanged
+ * so server-side validation shows its message; nothing is silently dropped.
  */
 export function normalizePesoInput(text: string): string {
-  if (/[^\d.]/.test(text)) return text;
-  const digits = text.replace(/\./g, "");
-  return digits === "" ? text : formatPesoInput(digits);
+  if (/[^\d.,]/.test(text)) return text;
+
+  let integerPart: string;
+  let decimalPart: string | null = null;
+
+  const commaParts = text.split(",");
+  if (commaParts.length > 2) return text;
+  if (commaParts.length === 2) {
+    if (commaParts[1].includes(".") || commaParts[1].length > 2) return text;
+    integerPart = commaParts[0].replace(/\./g, "");
+    decimalPart = commaParts[1];
+  } else {
+    const decimalDot = /^(\d+)\.(\d{0,2})$/.exec(text);
+    if (decimalDot !== null) {
+      integerPart = decimalDot[1];
+      decimalPart = decimalDot[2];
+    } else {
+      integerPart = text.replace(/\./g, "");
+    }
+  }
+
+  if (integerPart === "" && decimalPart === null) return text;
+  const grouped = integerPart === "" ? "0" : groupThousands(integerPart);
+  return decimalPart === null ? grouped : `${grouped},${decimalPart}`;
 }
 
-/** 1234567 -> '$1.234.567'; -5000 -> '-$5.000'. Whole pesos, never rounded. */
-export function formatArs(amount: number): string {
-  const sign = amount < 0 ? "-" : "";
-  return `${sign}$${groupThousands(String(Math.abs(amount)))}`;
+/**
+ * Integer cents -> es-AR peso text: 1989800 -> '$19.898'; 1989850 ->
+ * '$19.898,50'; -500 -> '-$5'. The ',xx' part appears only when the cents are
+ * non-zero, so whole-peso amounts read as before. Never rounds.
+ */
+export function formatArs(cents: number): string {
+  const sign = cents < 0 ? "-" : "";
+  const abs = Math.abs(cents);
+  const pesos = Math.trunc(abs / 100);
+  const fraction = abs % 100;
+  const decimals = fraction === 0 ? "" : `,${String(fraction).padStart(2, "0")}`;
+  return `${sign}$${groupThousands(String(pesos))}${decimals}`;
+}
+
+/**
+ * Integer cents -> text for an amount input: 150000 -> '1.500'; 150050 ->
+ * '1.500,50'. Same shape as `formatArs` without the '$'.
+ */
+export function formatCentsInput(cents: number): string {
+  return formatArs(cents).replace("$", "");
 }
 
 /** Expense -> '-$31.000', income -> '+$50.000'. */

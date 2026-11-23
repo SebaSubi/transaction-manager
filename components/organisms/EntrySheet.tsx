@@ -29,7 +29,7 @@ import { categoryColor } from "@/lib/domain/categories";
 import { formatArs } from "@/lib/domain/format";
 import { computeNetAmount } from "@/lib/domain/money";
 import type { TransactionType } from "@/lib/domain/types";
-import { parseCashbackBps, parseWholePesos } from "@/lib/domain/validation";
+import { parseCashbackBps, parseAmountCents } from "@/lib/domain/validation";
 import {
   INITIAL_TRANSACTION_FORM_STATE,
   type TransactionFormState,
@@ -49,7 +49,7 @@ export function EntrySheet() {
 /** Display-only preview: the same pure function the server uses for the net. */
 function previewFor(type: TransactionType, grossRaw: string, cashbackRaw: string): string | null {
   if (type !== "expense") return null;
-  const gross = parseWholePesos(grossRaw);
+  const gross = parseAmountCents(grossRaw);
   const cashback = parseCashbackBps(cashbackRaw);
   if (!gross.ok || !cashback.ok || cashback.value === 0) return null;
 

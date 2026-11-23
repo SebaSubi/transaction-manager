@@ -51,14 +51,14 @@ async function render(params: Record<string, string | string[] | undefined>) {
 beforeEach(() => {
   for (const mock of Object.values(repos)) mock.mockReset();
   repos.getBudgetsForMonth.mockResolvedValue([
-    { categoryId: 2, amount: 500 },
-    { categoryId: 1, amount: 1000 },
+    { categoryId: 2, amount: 50000 },
+    { categoryId: 1, amount: 100000 },
   ]);
   repos.listTransactionsInRange.mockResolvedValue([
-    expense(1, 1, 300),
-    expense(2, 1, 500),
-    expense(3, 2, 100),
-    expense(4, 9, 7000),
+    expense(1, 1, 30000),
+    expense(2, 1, 50000),
+    expense(3, 2, 10000),
+    expense(4, 9, 700000),
   ]);
   repos.listActiveCategoriesByKind.mockResolvedValue([
     { id: 1, name: "Super", kind: "expense", icon: "shopping-cart", colorIndex: 0 },

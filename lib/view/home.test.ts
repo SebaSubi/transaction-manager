@@ -26,9 +26,9 @@ const tx = (categoryId: number, amount: number): DomainTransaction => ({
 
 const baseInput = {
   budgetRows: [
-    { categoryId: 1, amount: 1000 },
-    { categoryId: 2, amount: 500 },
-    { categoryId: 3, amount: 200 },
+    { categoryId: 1, amount: 100000 },
+    { categoryId: 2, amount: 50000 },
+    { categoryId: 3, amount: 20000 },
   ],
   activeExpense: [cat(1), cat(2), cat(3)],
   monthTransactions: [] as DomainTransaction[],
@@ -39,8 +39,8 @@ describe("buildHomeCards", () => {
   it("builds a card with label, colour and progress", () => {
     const [card] = buildHomeCards({
       ...baseInput,
-      budgetRows: [{ categoryId: 1, amount: 1000 }],
-      monthTransactions: [tx(1, 800)],
+      budgetRows: [{ categoryId: 1, amount: 100000 }],
+      monthTransactions: [tx(1, 80000)],
     });
     expect(card).toMatchObject({
       id: 1,
@@ -50,15 +50,15 @@ describe("buildHomeCards", () => {
       spentLabel: "$800",
     });
     expect(card.color).toBe(categoryColor(1));
-    expect(card.progress).toEqual(budgetProgress(800, 1000));
+    expect(card.progress).toEqual(budgetProgress(80000, 100000));
   });
 
   it("excludes income categories and unbudgeted categories", () => {
     const cards = buildHomeCards({
       ...baseInput,
       budgetRows: [
-        { categoryId: 1, amount: 1000 },
-        { categoryId: 9, amount: 300 },
+        { categoryId: 1, amount: 100000 },
+        { categoryId: 9, amount: 30000 },
       ],
       activeExpense: [cat(1), cat(2), cat(9, "income")],
     });
@@ -82,8 +82,8 @@ describe("buildHomeCards", () => {
     const cards = buildHomeCards({
       ...baseInput,
       budgetRows: [
-        { categoryId: 3, amount: 1 },
-        { categoryId: 1, amount: 1 },
+        { categoryId: 3, amount: 100 },
+        { categoryId: 1, amount: 100 },
       ],
     });
     expect(cards.map((c) => c.id)).toEqual([1, 3]);
@@ -92,8 +92,8 @@ describe("buildHomeCards", () => {
   it("caps the bar and keeps the uncapped label when over budget", () => {
     const [card] = buildHomeCards({
       ...baseInput,
-      budgetRows: [{ categoryId: 2, amount: 500 }],
-      monthTransactions: [tx(2, 750)],
+      budgetRows: [{ categoryId: 2, amount: 50000 }],
+      monthTransactions: [tx(2, 75000)],
     });
     expect(card.progress.barPct).toBe(100);
     expect(card.progress.labelPct).toBe(150);

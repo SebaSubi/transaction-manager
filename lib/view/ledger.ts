@@ -3,6 +3,7 @@ import type { MemberLabel } from "@/lib/db/repositories/members.repository";
 import { categoryColor } from "@/lib/domain/categories";
 import {
   formatArs,
+  formatCentsInput,
   formatPercent,
   formatShortDate,
   formatSignedArs,
@@ -65,7 +66,7 @@ export function toLedgerRowView(
     },
     member: { id: member.id, name: member.name, archived: member.archived },
     edit: {
-      gross: String(tx.gross),
+      gross: formatCentsInput(tx.gross),
       cashback: formatPercent(tx.cashbackBps),
       dateValue: toDateTimeLocalValue(tx.date),
     },

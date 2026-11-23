@@ -4,7 +4,7 @@ import { and, eq, isNull } from "drizzle-orm";
 
 import { assertPooledNeonUrl } from "@/lib/db/pooledUrl";
 import { budgets, categories, members, transactions } from "@/lib/db/schema";
-import { computeNetAmount, percentToBps } from "@/lib/domain/money";
+import { computeNetAmount, percentToBps, pesosToCents } from "@/lib/domain/money";
 import { nowInBuenosAires, wallClockFromParts } from "@/lib/domain/time";
 import type { TransactionType } from "@/lib/domain/types";
 
@@ -148,11 +148,11 @@ async function main(): Promise<void> {
     const cashbackBps = percentToBps(fixture.cashbackPercent);
     return {
       type: fixture.type,
-      gross: fixture.gross,
+      gross: pesosToCents(fixture.gross),
       // Net is computed here, on the write path, exactly once — never on read.
       amount: computeNetAmount({
         type: fixture.type,
-        gross: fixture.gross,
+        gross: pesosToCents(fixture.gross),
         cashbackBps,
       }),
       cashbackBps,
@@ -173,7 +173,7 @@ async function main(): Promise<void> {
     Object.entries(byCategory).map(([name, amount]) => ({
       month,
       categoryId: requireCategory(name, "expense"),
-      amount,
+      amount: pesosToCents(amount),
       updatedAt: now,
     })),
   );

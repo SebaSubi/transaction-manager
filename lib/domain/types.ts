@@ -12,9 +12,9 @@ export type EffectiveTheme = "dark" | "light";
 export interface DomainTransaction {
   id: number;
   type: TransactionType;
-  // Net, whole ARS pesos.
+  // Net, integer ARS cents.
   amount: number;
-  // Whole ARS pesos.
+  // Integer ARS cents.
   gross: number;
   // 0..10000; always 0 when type === 'income'.
   cashbackBps: number;

@@ -4,7 +4,7 @@ import { FieldError } from "@/components/ui/FieldError";
 import { SHEET_COPY } from "@/lib/copy/es";
 import { normalizePesoInput } from "@/lib/domain/format";
 
-/** Whole-peso amount input: numeric keypad, `$` prefix, no decimals. Digits are grouped with thousands dots as typed. */
+/** Amount input: decimal keypad, `$` prefix, up to 2 decimals (es-AR). Digits are grouped with thousands dots as typed. */
 export function AmountField({
   value,
   onChange,
@@ -25,7 +25,7 @@ export function AmountField({
         <input
           name={name}
           type="text"
-          inputMode="numeric"
+          inputMode="decimal"
           autoComplete="off"
           className="amount-field__input"
           aria-label={SHEET_COPY.amountAriaLabel}

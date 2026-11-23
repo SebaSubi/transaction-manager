@@ -35,25 +35,45 @@ export interface ParsedTransactionInput {
   date: Date;
 }
 
-const MAX_WHOLE_PESOS = 999_999_999;
+// Largest accepted amount: $999.999.999,99 expressed in integer cents.
+const MAX_CENTS = 99_999_999_999;
 const MIN_YEAR = 2000;
 const MAX_YEAR = 2099;
 
-/** Parses a whole, positive amount of pesos; every failure has its own message. */
-export function parseWholePesos(raw: string | undefined): ParseResult<number, "value"> {
+/**
+ * Parses a positive peso amount into integer CENTS by string arithmetic (never
+ * a float). Accepts es-AR input: '.' thousands, ',' decimal with 1-2 digits
+ * ('1.500,50', '1500,5'), plain digits, and '.' as a decimal point only when
+ * unambiguous: 1-2 digits after the only '.' ('1500.5', '12.50'). '1.500' is
+ * thousands. Every failure has its own message.
+ */
+export function parseAmountCents(raw: string | undefined): ParseResult<number, "value"> {
   const text = (raw ?? "").trim();
   if (text === "") return { ok: false, errors: { value: M.grossRequired } };
-  if (/^-\d+$/.test(text)) return { ok: false, errors: { value: M.grossNotPositive } };
-  // Plain digits, or valid es-AR thousands grouping ('1.500', '12.000.000').
-  const plain = /^\d+$/.test(text);
-  if (!plain && !/^\d{1,3}(\.\d{3})+$/.test(text)) {
-    return { ok: false, errors: { value: M.grossNotWhole } };
+  if (/^-\d+(?:[.,]\d+)?$/.test(text)) {
+    return { ok: false, errors: { value: M.grossNotPositive } };
   }
 
-  const value = Number(plain ? text : text.replace(/\./g, ""));
-  if (value === 0) return { ok: false, errors: { value: M.grossNotPositive } };
-  if (value > MAX_WHOLE_PESOS) return { ok: false, errors: { value: M.grossTooLarge } };
-  return { ok: true, value };
+  let integerDigits: string;
+  let decimalDigits = "";
+  const esAr = /^(\d+|\d{1,3}(?:\.\d{3})+)(?:,(\d{1,2}))?$/.exec(text);
+  const dotDecimal = /^(\d+)\.(\d{1,2})$/.exec(text);
+  if (esAr !== null) {
+    integerDigits = esAr[1].replace(/\./g, "");
+    decimalDigits = esAr[2] ?? "";
+  } else if (dotDecimal !== null) {
+    integerDigits = dotDecimal[1];
+    decimalDigits = dotDecimal[2];
+  } else {
+    return { ok: false, errors: { value: M.grossInvalid } };
+  }
+
+  const cents = Number(integerDigits) * 100 + Number(decimalDigits.padEnd(2, "0"));
+  if (cents === 0) return { ok: false, errors: { value: M.grossNotPositive } };
+  if (!Number.isSafeInteger(cents) || cents > MAX_CENTS) {
+    return { ok: false, errors: { value: M.grossTooLarge } };
+  }
+  return { ok: true, value: cents };
 }
 
 /**
@@ -147,7 +167,7 @@ export function parseTransactionForm(
   const type = parseType(raw.type);
   if (type === null) errors.type = M.typeInvalid;
 
-  const gross = parseWholePesos(raw.gross);
+  const gross = parseAmountCents(raw.gross);
   if (!gross.ok) errors.gross = gross.errors.value;
 
   // Income forces cashback to 0: a stale value never blocks an income save.
@@ -184,9 +204,9 @@ export function parseTransactionForm(
   };
 }
 
-/** Budget amounts follow the same whole-peso rules, with a single message. */
+/** Budget amounts follow the same cents rules, with a single message. */
 export function parseBudgetAmount(raw: string | undefined): ParseResult<number, "amount"> {
-  const parsed = parseWholePesos(raw);
+  const parsed = parseAmountCents(raw);
   return parsed.ok
     ? parsed
     : { ok: false, errors: { amount: M.budgetAmountInvalid } };

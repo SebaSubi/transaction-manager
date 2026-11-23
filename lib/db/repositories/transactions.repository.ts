@@ -87,7 +87,7 @@ export async function listAllTransactions(
 
 export interface NewTransaction {
   type: TransactionType;
-  /** Net, whole ARS pesos — already produced by `computeNetAmount`. */
+  /** Net, integer ARS cents — already produced by `computeNetAmount`. */
   amount: number;
   gross: number;
   /** 0..10000; the DB CHECK forces 0 when `type` is 'income'. */

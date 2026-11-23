@@ -4,6 +4,7 @@ import { VALIDATION_MESSAGES as M } from "@/lib/domain/messages";
 import {
   checkBudgetCategory,
   checkTransactionReferences,
+  parseAmountCents,
   parseBudgetAmount,
   parseCashbackBps,
   NAME_MAX_LENGTH,
@@ -11,45 +12,58 @@ import {
   parseName,
   parsePositiveId,
   parseTransactionForm,
-  parseWholePesos,
   type RawTransactionForm,
   type ReferenceFacts,
 } from "@/lib/domain/validation";
 
-describe("parseWholePesos", () => {
+describe("parseAmountCents", () => {
   it.each([
-    ["33333", 33333],
-    ["  500  ", 500],
-    ["1", 1],
-    ["999999999", 999_999_999],
-    ["1.500", 1500],
-    ["33.333", 33333],
-    ["12.000.000", 12_000_000],
-    ["  1.500  ", 1500],
-  ])("accepts %j", (raw, value) => {
-    expect(parseWholePesos(raw)).toEqual({ ok: true, value });
+    ["33333", 3_333_300],
+    ["  500  ", 50_000],
+    ["1", 100],
+    ["999999999", 99_999_999_900],
+    ["999.999.999,99", 99_999_999_999],
+    ["1.500", 150_000],
+    ["33.333", 3_333_300],
+    ["12.000.000", 1_200_000_000],
+    ["  1.500  ", 150_000],
+    ["1.500,50", 150_050],
+    ["1500,5", 150_050],
+    ["1500,05", 150_005],
+    ["0,5", 50],
+    ["33,5", 3350],
+    ["1,50", 150],
+    ["1500.5", 150_050],
+    ["1500.50", 150_050],
+    ["1.5", 150],
+    ["1.50", 150],
+  ])("accepts %j as %i cents", (raw, value) => {
+    expect(parseAmountCents(raw)).toEqual({ ok: true, value });
   });
 
   it.each([
-    ["33,5", M.grossNotWhole],
-    ["1.5", M.grossNotWhole],
-    ["1.50", M.grossNotWhole],
-    ["1,5", M.grossNotWhole],
-    ["1.5000", M.grossNotWhole],
-    [".500", M.grossNotWhole],
-    ["1..500", M.grossNotWhole],
-    ["1.500,5", M.grossNotWhole],
-    ["1.", M.grossNotWhole],
-    ["abc", M.grossNotWhole],
-    ["12abc", M.grossNotWhole],
+    ["1.5000", M.grossInvalid],
+    ["1,555", M.grossInvalid],
+    ["1,", M.grossInvalid],
+    [".500", M.grossInvalid],
+    ["1..500", M.grossInvalid],
+    ["1,5,5", M.grossInvalid],
+    ["1.500.5", M.grossInvalid],
+    ["1,500.50", M.grossInvalid],
+    ["1.", M.grossInvalid],
+    ["abc", M.grossInvalid],
+    ["12abc", M.grossInvalid],
     ["0", M.grossNotPositive],
+    ["0,00", M.grossNotPositive],
     ["-5", M.grossNotPositive],
+    ["-5,5", M.grossNotPositive],
     ["", M.grossRequired],
     ["   ", M.grossRequired],
     [undefined, M.grossRequired],
     ["1000000000", M.grossTooLarge],
+    ["999.999.999,991", M.grossInvalid],
   ])("rejects %j with its own message", (raw, message) => {
-    expect(parseWholePesos(raw)).toEqual({ ok: false, errors: { value: message } });
+    expect(parseAmountCents(raw)).toEqual({ ok: false, errors: { value: message } });
   });
 });
 
@@ -98,7 +112,7 @@ describe("parseTransactionForm", () => {
     if (!result.ok) return;
     expect(result.value).toMatchObject({
       type: "expense",
-      gross: 33333,
+      gross: 3333300,
       cashbackBps: 700,
       categoryId: 3,
       memberId: 2,
@@ -201,14 +215,14 @@ describe("parseTransactionForm", () => {
 
 describe("parseBudgetAmount", () => {
   it("accepts a whole positive amount", () => {
-    expect(parseBudgetAmount("150000")).toEqual({ ok: true, value: 150000 });
+    expect(parseBudgetAmount("150000")).toEqual({ ok: true, value: 15000000 });
   });
 
   it("accepts thousands grouping with dots", () => {
-    expect(parseBudgetAmount("12.000.000")).toEqual({ ok: true, value: 12_000_000 });
+    expect(parseBudgetAmount("12.000.000")).toEqual({ ok: true, value: 1_200_000_000 });
   });
 
-  it.each(["1.5", "0", "-3", "", undefined, "abc", "1000000000"])(
+  it.each(["1,555", "0", "-3", "", undefined, "abc", "1000000000"])(
     "rejects %j with the budget message",
     (raw) => {
       expect(parseBudgetAmount(raw)).toEqual({

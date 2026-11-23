@@ -42,7 +42,7 @@ const row: LedgerRowView = {
   dateLabel: "14 ago · 21:00",
   category: { id: 1, name: "Super", icon: "shopping-cart", archived: false, color: "var(--accent-0)" },
   member: { id: 11, name: "Mati", archived: false },
-  edit: { gross: "33333", cashback: "7", dateValue: "2026-08-14T21:00" },
+  edit: { gross: "33.333", cashback: "7", dateValue: "2026-08-14T21:00" },
 };
 
 const archivedRow: LedgerRowView = {
@@ -160,7 +160,7 @@ describe("EntrySheet (create)", () => {
     fireEvent.change(screen.getByLabelText("Monto"), { target: { value: "33333" } });
     fireEvent.change(screen.getByLabelText("Cashback"), { target: { value: "7" } });
 
-    expect(screen.getByText("Gasto final $31.000 · ahorro $2.333")).toBeDefined();
+    expect(screen.getByText("Gasto final $30.999,69 · ahorro $2.333,31")).toBeDefined();
     expect(document.querySelector('input[name="amount"]')).toBeNull();
   });
 

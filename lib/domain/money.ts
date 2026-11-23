@@ -1,8 +1,8 @@
 import type { TransactionType } from "@/lib/domain/types";
 
 /**
- * Applies cashback to expense transactions only, rounding to whole pesos
- * exactly once, on the server write path. Never re-round at render.
+ * Applies cashback to expense transactions only, rounding to whole cents
+ * exactly once (amounts are integer cents), on the server write path. Never re-round at render.
  *
  * `net = max(0, round(gross * (1 - cashbackBps / 10_000)))`.
  *
@@ -28,6 +28,11 @@ export function computeNetAmount(input: {
   }
 
   return Math.max(0, Math.round(gross * (1 - cashbackBps / 10_000)));
+}
+
+/** Whole pesos -> integer cents (seeds and fixtures). */
+export function pesosToCents(pesos: number): number {
+  return Math.round(pesos * 100);
 }
 
 /**

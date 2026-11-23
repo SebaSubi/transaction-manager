@@ -145,7 +145,7 @@ describe("assertSession in every mutating action", () => {
 });
 
 describe("upsertBudgetAction", () => {
-  it.each([["0"], ["-3"], ["1.5"], [""], ["abc"]])(
+  it.each([["0"], ["-3"], ["1,555"], [""], ["abc"]])(
     "rejects the amount %j without a write",
     async (amount) => {
       const state = await upsertBudgetAction(IDLE, form({ ...VALID_FIELDS, amount }));
@@ -220,17 +220,17 @@ describe("upsertBudgetAction", () => {
 
     const state = await upsertBudgetAction(IDLE, form(VALID_FIELDS));
 
-    expect(state).toEqual({ status: "saved", categoryId: 3, amount: 50000 });
+    expect(state).toEqual({ status: "saved", categoryId: 3, amount: 5000000 });
   });
 
   it("upserts, revalidates presupuesto and inicio, and returns the saved row", async () => {
     const state = await upsertBudgetAction(IDLE, form(VALID_FIELDS));
 
     expect(repo.upsertBudget).toHaveBeenCalledWith(
-      { month: "2026-08", categoryId: 3, amount: 50000 },
+      { month: "2026-08", categoryId: 3, amount: 5000000 },
       expect.any(Date),
     );
-    expect(state).toEqual({ status: "saved", categoryId: 3, amount: 50000 });
+    expect(state).toEqual({ status: "saved", categoryId: 3, amount: 5000000 });
     expect(revalidated.paths).toEqual(["/presupuesto", "/inicio"]);
   });
 

@@ -11,7 +11,7 @@ const row: BudgetRowView = {
   icon: "shopping-cart",
   color: "var(--accent-0)",
   archived: false,
-  amount: 1000,
+  amount: 100000,
   amountLabel: "$1.000",
   spentLabel: "gastado $800",
   progress: { spent: 800, budgeted: 1000, remaining: 200, barPct: 80, labelPct: 80, overBudget: false, hasBudget: true },
@@ -48,7 +48,7 @@ describe("BudgetRow", () => {
   });
 
   it("loads the saved amount grouped with thousands dots", () => {
-    const { input } = setup({ amount: 12000000 });
+    const { input } = setup({ amount: 1200000000 });
     expect(input.value).toBe("12.000.000");
   });
 
@@ -58,10 +58,16 @@ describe("BudgetRow", () => {
     expect(input.value).toBe("12.000.000");
   });
 
-  it("leaves a value with a comma as typed", () => {
+  it("shows saved cents with a comma decimal", () => {
+    const { input } = setup({ amount: 150050 });
+    expect(input.value).toBe("1.500,50");
+    expect(input.inputMode).toBe("decimal");
+  });
+
+  it("keeps a comma decimal part as typed", () => {
     const { input } = setup();
     fireEvent.change(input, { target: { value: "1500,50" } });
-    expect(input.value).toBe("1500,50");
+    expect(input.value).toBe("1.500,50");
   });
 
   it("submits a changed amount on blur", () => {

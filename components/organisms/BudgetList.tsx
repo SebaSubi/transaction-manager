@@ -5,6 +5,7 @@ import { startTransition, useOptimistic, useState } from "react";
 import { removeBudgetAction, upsertBudgetAction } from "@/app/actions/budgets";
 import { BudgetRow } from "@/components/molecules/BudgetRow";
 import { INITIAL_BUDGET_FORM_STATE } from "@/lib/actions/state";
+import { parseAmountCents } from "@/lib/domain/validation";
 import { VALIDATION_MESSAGES } from "@/lib/domain/messages";
 import type { MonthKey } from "@/lib/domain/types";
 import type { BudgetRowView } from "@/lib/view/budgets";
@@ -27,7 +28,7 @@ function applyChange(
 
 /**
  * Budget rows with optimistic remove and amount edits. The only value applied
- * optimistically is the integer the user typed: progress bars and labels are
+ * optimistically is the amount (in cents) the user typed: progress bars and labels are
  * computed on the server and arrive with the revalidated rows.
  */
 export function BudgetList({
@@ -62,8 +63,9 @@ export function BudgetList({
 
   function handleAmountChange(categoryId: number, raw: string) {
     startTransition(async () => {
-      if (/^[1-9]\d*$/.test(raw)) {
-        applyOptimistic({ kind: "amount", categoryId, amount: Number(raw) });
+      const parsed = parseAmountCents(raw);
+      if (parsed.ok) {
+        applyOptimistic({ kind: "amount", categoryId, amount: parsed.value });
       }
 
       const form = new FormData();

@@ -762,9 +762,13 @@ a {
   gap: 8px;
 }
 
+/* `minmax(0, 1fr)`, not `1fr`: a bare `1fr` is `minmax(auto, 1fr)`, so a
+   column can never shrink below its widest card's min-content. A nowrap
+   category name or an unbroken amount then widened the column past the
+   viewport, and `body { overflow-x: hidden }` clipped the right column. */
 .home-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -772,6 +776,7 @@ a {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
   padding: 12px;
   background: var(--surface-card);
   border: 1px solid var(--border);
@@ -795,6 +800,12 @@ a {
   display: flex;
   gap: 8px;
   align-items: center;
+  min-width: 0;
+}
+
+.home-card__icon {
+  display: inline-flex;
+  flex: none;
 }
 
 .home-card__name {
@@ -810,6 +821,48 @@ a {
 .home-card__spent {
   color: var(--text-secondary);
   font-size: 12px;
+}
+
+.home-card__pct {
+  flex: none;
+}
+
+/* The "gastado $X de $Y" line wraps, and breaks inside a long amount rather
+   than overflowing the card. */
+.home-card__spent {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Narrow phones (360-400px): tighter card so both columns stay in view. */
+@media (max-width: 400px) {
+  .home-grid {
+    gap: 8px;
+  }
+
+  .home-card {
+    gap: 6px;
+    padding: 10px;
+    border-radius: 12px;
+  }
+
+  .home-card__head {
+    gap: 6px;
+  }
+
+  .home-card__icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .home-card__name {
+    font-size: 14px;
+  }
+
+  .home-card__pct,
+  .home-card__spent {
+    font-size: 11px;
+  }
 }
 
 /* ---------- perfil ---------- */
